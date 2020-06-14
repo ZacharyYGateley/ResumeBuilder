@@ -4,11 +4,12 @@ package com.zygateley.resume;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 
 public class SQLite {
 	private Connection connection;
-	private String url = "jdbc:sqlite:/CV.db";
+	private String url = "jdbc:sqlite:CV.db";
 	
 	/**
 	 * Create a new connection object 
@@ -28,6 +29,7 @@ public class SQLite {
 	 * Connect to the CV database 
 	 */
     public void connect() {
+    	System.out.println("Current working directory: " + System.getProperty("user.dir"));
     	// Driver, type, database location
         try {
             // create a connection to the database
@@ -37,7 +39,9 @@ public class SQLite {
             System.out.append(this.url + "\n");
             
         } catch (SQLException e) {
-            System.out.println(e.getMessage());   
+            System.out.println(e.getMessage());
+            System.out.println("Please make sure that the driver is installed,");
+            System.out.println("and the current working directory is the project directory.");
         }
     }
     
@@ -51,6 +55,18 @@ public class SQLite {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+    
+    public Statement createStatement() throws SQLException {
+    	if (this.connection != null) {
+    		try {
+    			return this.connection.createStatement();
+    		}
+    		catch (SQLException ex) {
+    			System.out.println(ex.getMessage());
+    		}
+    	}
+    	return null;
     }
     
     

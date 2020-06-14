@@ -1,3 +1,4 @@
+<%@ page import="com.zygateley.resume.Details,com.zygateley.resume.SQLite" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -28,6 +29,11 @@
         </tr>
         <tr>
           <td align=left valign=top colspan=2>
+
+<jsp:include page="/includes/details.jsp" flush="true">
+	<jsp:param value="EDUCATION" name="type"/>
+	<jsp:param value="1" name="parentId"/>
+</jsp:include>
 
 <table cellspacing="0" cellpadding="0" border=0 style="padding:0;">
   <tbody>
