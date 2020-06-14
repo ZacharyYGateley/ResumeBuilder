@@ -1,0 +1,103 @@
+.Body {
+	font-family:Calibri;
+	font-size:12pt;
+	margin: -6px 4px 0px 4px;
+	width:804px;
+}
+.Title {
+	font-size:20pt;
+	margin-bottom:8px;
+	text-align:center;
+}
+.SubTitle {
+	color:#0066CC;
+	margin-bottom:2px;
+	text-align:center;
+}
+.Header {
+	border-bottom:1px solid #0066CC;
+	color:#0066CC;
+	font-weight:bold;
+	margin-top:18px;
+}
+.SubHeader {
+	font-weight:bold;
+	padding-top:3px;
+}
+.SubSubHeader {
+	font-style:italic;
+}
+.Left {
+	text-align:left;
+}
+.Center {
+	text-align:center;
+}
+.Right {
+	text-align:right;
+}
+.TableSpacer {
+	font-size:8px;
+}
+.Column1 {
+	font-size:inherit;
+}
+.Column2, .Column3, .Column4 {
+	width:25%;
+}
+.ListA {
+	list-style-type:circle;
+}
+.ListB {
+	list-style-type:disc;
+}
+.ListB li {
+	white-space:nowrap;
+}
+.Hidden {
+	display:none;
+}
+.OtherSkillsTop {
+	padding-top:6px;
+}
+.latin {
+	font-style:italic;
+	font-family:serif;
+	text-transform:lowercase;
+}
+.Proficiency {
+	font-style:italic;
+}
+
+table {
+	box-sizing:border-box;
+	font-family:inherit;
+	font-size:inherit;
+	padding-left:12px;
+	width:100%;
+}
+tbody {
+	font-family:inherit;
+	font-size:inherit;
+	padding:0;
+	margin:0;
+}
+tr {
+	font-family:inherit;
+	font-size:inherit;
+	padding:0;
+	margin:0;
+}
+td {
+	font-family:inherit;
+	font-size:inherit;
+	padding:0;
+	margin:0;
+	text-align:left;
+}
+ul {
+	margin-bottom:0;
+	margin-left:0;
+	margin-top:0;
+	padding-inline-start:30px;
+}
