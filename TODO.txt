@@ -1,2 +1,3 @@
-Build database output into CV index.jsp
-Create page to allow specific selection of what to output
+Details
+	alignment of Degree type, multiple organizations
+	verify date order

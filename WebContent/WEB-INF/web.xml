@@ -9,4 +9,26 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  
+  <servlet>
+    <servlet-name>Form</servlet-name>
+    <servlet-class>com.zygateley.resume.Servlet.Form</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Form</servlet-name>
+    <url-pattern>/index</url-pattern>
+    <url-pattern>/index.html</url-pattern>
+    <url-pattern>/index.jsp</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>Resume</servlet-name>
+    <servlet-class>com.zygateley.resume.Servlet.Resume</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Resume</servlet-name>
+    <url-pattern>/resume</url-pattern>
+    <url-pattern>/resume.html</url-pattern>
+    <url-pattern>/resume.jsp</url-pattern>
+  </servlet-mapping>
 </web-app>

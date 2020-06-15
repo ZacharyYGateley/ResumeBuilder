@@ -1,15 +1,12 @@
 package com.zygateley.resume;
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 
 public class SQLite {
 	private Connection connection;
-	private String url = "jdbc:sqlite:CV.db";
+	private String url = "jdbc:sqlite:C:\\Users\\Zachary Gateley\\Dropbox\\Languages\\Java\\Resume\\CV.db";
 	
 	/**
 	 * Create a new connection object 
@@ -61,6 +58,18 @@ public class SQLite {
     	if (this.connection != null) {
     		try {
     			return this.connection.createStatement();
+    		}
+    		catch (SQLException ex) {
+    			System.out.println(ex.getMessage());
+    		}
+    	}
+    	return null;
+    }
+    
+    public PreparedStatement prepareStatement(String stmt) throws SQLException {
+    	if (this.connection != null) {
+    		try {
+    			return this.connection.prepareStatement(stmt);
     		}
     		catch (SQLException ex) {
     			System.out.println(ex.getMessage());
