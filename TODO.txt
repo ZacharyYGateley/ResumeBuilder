@@ -1,1 +1,2 @@
-Make use of JSP views instead of solely servlets and classes
+Refactor getEducationSet, get*Set --> getEducationList, ...
+getEducationSet, get*Set all are almost identical. Can combine into one method?

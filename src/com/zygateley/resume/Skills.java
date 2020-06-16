@@ -7,35 +7,49 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.*;
 
-// Mirrors a single record in Skill table
-class SkillBlock {
-	public final int ID;
-	public final String TITLE;
-	public SkillBlock(int id, String title) {
-		this.ID = id;
-		this.TITLE = title;
-	}
-}
 
-//Mirrors a single record in SkillDetail table
-class SkillDetailBlock {
-	public final int ID;
-	public final int SKILLS_ID;
-	public final String TITLE;
-	public final int PROFICIENCY;
-	SkillDetailBlock(int id, int skills_id, String title, int proficiency) {
-		this.ID = id;
-		this.SKILLS_ID = skills_id;
-		this.TITLE = title;
-		this.PROFICIENCY = proficiency;
-	}
-}
 
 
 public class Skills {
 	private static final String QUERY = "SELECT * FROM Skills";
-	private static final String QUERY_DETAIL = "SELECT * FROM SkillsDetail WHERE SKILLS_ID=?";
-	private static final int SECTION_COUNT = 3; 
+	private static final String QUERY_FULL = 
+			"SELECT s.ID, s.TITLE, \r\n" + 
+			"sd.ID as DETAIL_ID, sd.SKILLS_ID,\r\n" + 
+			"sd.TITLE AS DETAIL_TITLE, sd.PROFICIENCY\r\n" + 
+			"FROM SkillsDetail AS sd LEFT JOIN Skills AS s\r\n" + 
+			"ON s.ID=sd.SKILLS_ID\r\n" + 
+			"ORDER BY s.ID, DETAIL_ID";
+	public static final int SECTION_COUNT = 3; 
+	
+	// Skill joined structure
+	// Mirrors single Skills record
+	// Contains mirrors of SkillsDetails records
+	public static class Section {
+		// SkillDetail structure
+		// Mirrors a single record in SkillDetail table
+		public static class Detail {
+			public final String TITLE;
+			public final String PROFICIENCY;
+			Detail(String title, String proficiency) {
+				this.TITLE = title;
+				this.PROFICIENCY = proficiency;
+			}
+		}
+		
+		public final int ID;
+		public final String TITLE;
+		public ArrayList<Detail> details;
+		public Section(int id, String title) {
+			this.ID = id;
+			this.TITLE = title;
+			this.details = new ArrayList<Skills.Section.Detail>();
+		}
+		
+		public void addDetail(String title, String proficiency) {
+			Detail newDetail = new Skills.Section.Detail(title, proficiency);
+			this.details.add(newDetail);
+		}
+	}
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
@@ -63,129 +77,88 @@ public class Skills {
 			System.out.println("ERROR: " + err.getMessage());
 		}
 		finally {
-			statement.close();
+			if (statement != null) {
+				statement.close();
+			}
 		}
 		
 		return;
 	}
 	
-	public static void writeOutput(
+	public static ArrayList<Skills.Section> getSkillList(
 			HttpServletRequest request, 
-			HttpServletResponse response, 
-			SQLite database, 
-			PrintWriter out
+			HttpServletResponse response
 			) throws SQLException, IOException {
-		// Find which skills should be output
-		ArrayList<Integer> skills = new ArrayList<>(
-				Arrays.stream(request.getParameterValues("SKILL_ID"))
-				.map(s -> Integer.parseInt(s))
-				.collect(Collectors.toList())
-				);
+
+		// Connect to database
+		SQLite database = new SQLite();
+		database.connect();
 		
-		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Skills.QUERY);
+		// Return array
+		ArrayList<Skills.Section> skillList = null;
 		
-		ArrayList<SkillBlock> records = new ArrayList<>();
-		try {
-			while (results.next()) {
-				int id = results.getInt("ID");
-				if (!skills.contains(id)) {
-					continue;
+		try {		
+			// Find which skills should be output
+			ArrayList<Integer> includedSkillsById = new ArrayList<>(
+					Arrays.stream(request.getParameterValues("SKILL_ID"))
+					.map(s -> Integer.parseInt(s))
+					.collect(Collectors.toList())
+					);
+	
+			// Return array
+			skillList = new ArrayList<Skills.Section>();
+			
+			Statement statement = database.createStatement();
+			ResultSet results = statement.executeQuery(Skills.QUERY_FULL);
+			
+			try {
+				int skillId = -1;
+				Skills.Section skill = null;
+				while (results.next()) {
+					int id = results.getInt("ID");
+					if (!includedSkillsById.contains(id)) {
+						continue;
+					}
+					if (skillId != id) {
+						// Ordered by ID
+						skillId = id;
+						skill = new Skills.Section(
+								id,
+								results.getString("TITLE")
+								);
+						skillList.add(skill);
+					}
+					// Add this detail to the selected skill
+					String title = results.getString("DETAIL_TITLE");
+					int proficiency = results.getInt("PROFICIENCY");
+					String proficiencyString = Skills.proficiencyIntegerToString(proficiency); 
+					skill.addDetail(title, proficiencyString);
 				}
-				SkillBlock next = new SkillBlock(
-						id,
-						results.getString("TITLE")
-						);
-				records.add(next);
+			}
+			finally {
+				if (statement != null) {
+					statement.close();
+				}
 			}
 		}
 		finally {
-			statement.close();
-		}
-		int recordsCount = records.size();
-
-		out.println("<table border=0 cellspacing=0 cellpadding=0>");
-		out.println("<tbody>");
-		for (int skillRecord = 0; skillRecord < recordsCount; skillRecord++) {
-			SkillBlock record = records.get(skillRecord);
-			
-			out.println("<tr>");
-			out.print("<td align=left valign=top class=\"SubSubHeader OtherSkillsTop NoWrap Column1\">");
-			out.print(record.TITLE);
-			out.println("</td>");
-			
-			PreparedStatement _statement = database.prepareStatement(Skills.QUERY_DETAIL);
-			try {
-				_statement.setInt(1, record.ID);
-				ResultSet _results = _statement.executeQuery();
-				
-				// Have to cut skills into sections
-				ArrayList<SkillDetailBlock> _records = new ArrayList<>();
-				while (_results.next()) {
-					SkillDetailBlock next = new SkillDetailBlock(
-							_results.getInt("ID"),
-							_results.getInt("SKILLS_ID"),
-							_results.getString("TITLE"),
-							_results.getInt("PROFICIENCY")
-							);
-					_records.add(next);
-				}
-				int recCount = _records.size();
-				int perColumn = (int) (Math.ceil(recCount / (double) Skills.SECTION_COUNT));
-				
-				// Loop columns
-				int recordIndex = 0;
-				OUTER_LOOP: for (int col = 0; col < recCount; col++) {
-					// Last column should span the rest of the columns
-					boolean isMultispan = recordIndex == recCount - 1;
-					
-					
-					out.print("<td align=left valign=top class=\"OtherSkillsTop NoWrap");
-					if (isMultispan) {
-						out.print("\" colspan=\"" + (Skills.SECTION_COUNT - col));
-					}
-					else {
-						out.print(" Column" + (col + 2));
-					}
-					out.println("\">");
-					out.println("<ul  class=\"List" + (skillRecord % 2) + "\">");
-					for (int i = 0; i < perColumn; i++, recordIndex++) {
-						SkillDetailBlock next;
-						try {
-							next = _records.get(recordIndex);
-						}
-						catch (Exception err) {
-							break OUTER_LOOP;
-						}
-						out.println("<li>" + next.TITLE);
-						out.println("<span class=\"Proficiency\">");
-						if (next.PROFICIENCY == 5) {
-							out.println("(Proficient)");
-						}
-						else if (next.PROFICIENCY > 2) {
-							out.println("(Familiar)");
-						}
-						else {
-							out.println("(Somewhat familiar)");
-						}
-						out.println("</span>");
-						out.println("</li>");
-					}
-				}
-				out.println("</ul>");
-				out.println("</td>");
-
-				// Spacer between each Skill set
-				out.println("<tr><td class=\"TableSpacer\">&nbsp;</td></tr>");
-			}
-			finally {
-				_statement.close();
-				
+			if (database != null) {
+				database.close();
 			}
 		}
-		out.println("</tbody>");
-		out.println("</table>");
 		
-		return;
+		return skillList;
+	}
+	
+	private static String proficiencyIntegerToString(int proficiencyInt) {
+		if (proficiencyInt == 5) {
+			return "Proficient";
+		}
+		else if (proficiencyInt> 2) {
+			return "Familiar";
+		}
+		else {
+			return "Somewhat familiar";
+		}
 	}
 }

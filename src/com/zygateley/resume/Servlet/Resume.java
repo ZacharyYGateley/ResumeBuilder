@@ -2,6 +2,7 @@ package com.zygateley.resume.Servlet;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -48,42 +49,42 @@ public class Resume extends HttpServlet {
 		out.println("<body style=\"margin:0;\">");
 		out.println("<div class=\"Body\">");
 		
+		
 		// Output header
 		RequestDispatcher dispatch = request.getRequestDispatcher("/includes/header.html");
 		dispatch.include(request, response);
 		
-		try {
-			out.println("<form method=\"get\" action=\"/Resume/resume.jsp\">");
-			
-			// EDUCATION
-			if (request.getParameter("EDUCATION_ID") != null) {
-				out.println("<div class=\"Header\">EDUCATION</div>");
-				Education.writeOutput(request, response, database, out);
-			}
-			
-			// EXPERIENCE
-			if (request.getParameter("EXPERIENCE_ID") != null) {
-				out.println("<div class=\"Header\">EXPERIENCE</div>");
-				Experience.writeOutput(request, response, database, out);
-			}
-			
-			// SKILLS
-			if (request.getParameter("SKILL_ID") != null) { 
-				out.println("<div class=\"Header\">SKILLS</div>");
-				Skills.writeOutput(request,  response,  database, out);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		
+		// EDUCATION
+		if (request.getParameter("EDUCATION_ID") != null) {
+			//out.println("<div class=\"Header\">EDUCATION</div>");
+			//Education.writeOutput(request, response, database, out);
+			dispatch = request.getRequestDispatcher("/includes/Education.jsp");
+			dispatch.include(request, response);
 		}
 		
-		try {
-			out.println("</div>");
-			out.println("</body>");
-			out.println("</html>");			
+		// EXPERIENCE
+		if (request.getParameter("EXPERIENCE_ID") != null) {
+			//out.println("<div class=\"Header\">EXPERIENCE</div>");
+			//Experience.writeOutput(request, response, database, out);
+			dispatch = request.getRequestDispatcher("/includes/Experience.jsp");
+			dispatch.include(request, response);
 		}
-		finally {
-			out.close();
+		
+		// SKILLS
+		if (request.getParameter("SKILL_ID") != null) { 
+			dispatch = request.getRequestDispatcher("/includes/Skills.jsp");
+			dispatch.include(request, response);
 		}
+		
+		
+		// Finish html bosy
+		out.println("</div>");
+		out.println("</body>");
+		out.println("</html>");			
+
+		// Close output stream
+		out.close();
 	}
 
 	/**
