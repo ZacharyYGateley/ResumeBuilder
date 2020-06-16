@@ -33,13 +33,13 @@ class SkillDetailBlock {
 
 
 public class Skills {
-	private static final String query = "SELECT * FROM Skills";
-	private static final String embeddedQuery = "SELECT * FROM SkillsDetail WHERE SKILLS_ID=?";
-	private static final int sectionCount = 3; 
+	private static final String QUERY = "SELECT * FROM Skills";
+	private static final String QUERY_DETAIL = "SELECT * FROM SkillsDetail WHERE SKILLS_ID=?";
+	private static final int SECTION_COUNT = 3; 
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Skills.query);
+		ResultSet results = statement.executeQuery(Skills.QUERY);
 		
 		try {
 			out.println("<table border=0 cellspacing=0 cellpadding=0>");
@@ -83,7 +83,7 @@ public class Skills {
 				);
 		
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Skills.query);
+		ResultSet results = statement.executeQuery(Skills.QUERY);
 		
 		ArrayList<SkillBlock> records = new ArrayList<>();
 		try {
@@ -114,7 +114,7 @@ public class Skills {
 			out.print(record.TITLE);
 			out.println("</td>");
 			
-			PreparedStatement _statement = database.prepareStatement(Skills.embeddedQuery);
+			PreparedStatement _statement = database.prepareStatement(Skills.QUERY_DETAIL);
 			try {
 				_statement.setInt(1, record.ID);
 				ResultSet _results = _statement.executeQuery();
@@ -131,7 +131,7 @@ public class Skills {
 					_records.add(next);
 				}
 				int recCount = _records.size();
-				int perColumn = (int) (Math.ceil(recCount / (double) Skills.sectionCount));
+				int perColumn = (int) (Math.ceil(recCount / (double) Skills.SECTION_COUNT));
 				
 				// Loop columns
 				int recordIndex = 0;
@@ -142,7 +142,7 @@ public class Skills {
 					
 					out.print("<td align=left valign=top class=\"OtherSkillsTop NoWrap");
 					if (isMultispan) {
-						out.print("\" colspan=\"" + (Skills.sectionCount - col));
+						out.print("\" colspan=\"" + (Skills.SECTION_COUNT - col));
 					}
 					else {
 						out.print(" Column" + (col + 2));

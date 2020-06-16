@@ -45,12 +45,12 @@ class EducationDetailBlock {
 
 
 public class Education {
-	private static final String query = "SELECT Education.*, EducationDetail.END_DATE FROM Education LEFT OUTER JOIN EducationDetail ON Education.ID = EducationDetail.ID ORDER BY EducationDetail.END_DATE DESC";
-	private static final String embeddedQuery = "SELECT * FROM EducationDetail WHERE EDUCATION_ID=? ORDER BY END_DATE DESC"; 
+	private static final String QUERY = "SELECT Education.*, EducationDetail.END_DATE FROM Education LEFT OUTER JOIN EducationDetail ON Education.ID = EducationDetail.ID ORDER BY EducationDetail.END_DATE DESC";
+	private static final String QUERY_DETAIL = "SELECT * FROM EducationDetail WHERE EDUCATION_ID=? ORDER BY END_DATE DESC"; 
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Education.query);
+		ResultSet results = statement.executeQuery(Education.QUERY);
 		
 		try {
 			out.println("<table border=0 cellspacing=0 cellpadding=0>");
@@ -94,7 +94,7 @@ public class Education {
 				);
 		
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Education.query);
+		ResultSet results = statement.executeQuery(Education.QUERY);
 		
 		// So that there are no embedded statements
 		// Create ArrayLis5t with results
@@ -138,7 +138,7 @@ public class Education {
 			out.println("<td align=left valign=top colspan=2>");
 			
 			// Output each degree (education instance) from this organization
-			PreparedStatement _statement = database.prepareStatement(Education.embeddedQuery);
+			PreparedStatement _statement = database.prepareStatement(Education.QUERY_DETAIL);
 			try {
 				_statement.setInt(1, record.ID);
 				ResultSet _results = _statement.executeQuery();

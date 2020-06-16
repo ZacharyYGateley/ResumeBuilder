@@ -43,12 +43,12 @@ class ExperienceDetailBlock {
 
 
 public class Experience {
-	private static final String query = "SELECT * FROM Experience ORDER BY DATE_END DESC";
-	private static final String embeddedQuery = "SELECT * FROM ExperienceDetail WHERE EXPERIENCE_ID=? ORDER BY ID DESC"; 
+	private static final String QUERY = "SELECT * FROM Experience ORDER BY DATE_END DESC";
+	private static final String QUERY_DETAIL = "SELECT * FROM ExperienceDetail WHERE EXPERIENCE_ID=? ORDER BY ORDER ASC"; 
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Experience.query);
+		ResultSet results = statement.executeQuery(Experience.QUERY);
 		
 		try {
 			out.println("<table border=0 cellpadding=0 cellspacing=0>");
@@ -101,7 +101,7 @@ public class Experience {
 				);
 		
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Experience.query);
+		ResultSet results = statement.executeQuery(Experience.QUERY);
 		
 		// So that there are no embedded statements
 		// Create ArrayLis5t with results
@@ -151,7 +151,7 @@ public class Experience {
 			out.println("</tr>");
 			
 			// Output each degree (experience instance) from this organization
-			PreparedStatement _statement = database.prepareStatement(Experience.embeddedQuery);
+			PreparedStatement _statement = database.prepareStatement(Experience.QUERY_DETAIL);
 			try {
 				_statement.setInt(1, record.ID);
 				ResultSet _results = _statement.executeQuery();
