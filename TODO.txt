@@ -1,4 +1,1 @@
-Move Education, Experience, Skills to views (jsp)
-Details
-	alignment of Degree type, multiple organizations
-	verify date order
+Make use of JSP views instead of solely servlets and classes

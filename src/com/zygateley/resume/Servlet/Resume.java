@@ -45,7 +45,7 @@ public class Resume extends HttpServlet {
 		out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"styles/Resume.css\" />");
 		out.println("<title>Resume - Zach Gateley</title>");
 		out.println("</head>");
-		out.println("<body>");
+		out.println("<body style=\"margin:0;\">");
 		out.println("<div class=\"Body\">");
 		
 		// Output header
@@ -58,31 +58,19 @@ public class Resume extends HttpServlet {
 			// EDUCATION
 			if (request.getParameter("EDUCATION_ID") != null) {
 				out.println("<div class=\"Header\">EDUCATION</div>");
-				out.println("<table border=0 cellspacing=0 cellpadding=0>");
-				out.println("<tbody>");
 				Education.writeOutput(request, response, database, out);
-				out.println("</tbody>");
-				out.println("</table>");
 			}
 			
 			// EXPERIENCE
 			if (request.getParameter("EXPERIENCE_ID") != null) {
 				out.println("<div class=\"Header\">EXPERIENCE</div>");
-				out.println("<table border=0 cellspacing=0 cellpadding=0>");
-				out.println("<tbody>");
 				Experience.writeOutput(request, response, database, out);
-				out.println("</tbody>");
-				out.println("</table>");
 			}
 			
 			// SKILLS
 			if (request.getParameter("SKILL_ID") != null) { 
 				out.println("<div class=\"Header\">SKILLS</div>");
-				out.println("<table border=0 cellspacing=0 cellpadding=0>");
-				out.println("<tbody>");
 				Skills.writeOutput(request,  response,  database, out);
-				out.println("</tbody>");
-				out.println("</table>");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

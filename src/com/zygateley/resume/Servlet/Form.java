@@ -45,7 +45,7 @@ public class Form extends HttpServlet {
 		out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"styles/Resume.css\" />");
 		out.println("<title>Resume - Zach Gateley</title>");
 		out.println("</head>");
-		out.println("<body>");
+		out.println("<body style=\"margin:0;\">");
 		out.println("<div class=\"Body\">");
 		
 		// Output header

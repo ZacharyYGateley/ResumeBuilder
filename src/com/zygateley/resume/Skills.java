@@ -103,7 +103,9 @@ public class Skills {
 			statement.close();
 		}
 		int recordsCount = records.size();
-		
+
+		out.println("<table border=0 cellspacing=0 cellpadding=0>");
+		out.println("<tbody>");
 		for (int skillRecord = 0; skillRecord < recordsCount; skillRecord++) {
 			SkillBlock record = records.get(skillRecord);
 			
@@ -181,6 +183,8 @@ public class Skills {
 				
 			}
 		}
+		out.println("</tbody>");
+		out.println("</table>");
 		
 		return;
 	}

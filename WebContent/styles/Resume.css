@@ -1,7 +1,8 @@
 .Body {
 	font-family:Calibri;
 	font-size:12pt;
-	margin: -6px auto 0px auto;
+	/* margin-left, margin-right auto add margin to printout :-( */
+	margin: -6px 0 0px 0;
 	width:804px;
 }
 .Title {
@@ -23,6 +24,7 @@
 .SubHeader {
 	font-weight:bold;
 	padding-top:3px;
+	text-transform:uppercase;
 }
 .SubSubHeader {
 	font-style:italic;
@@ -76,7 +78,8 @@ table {
 	box-sizing:border-box;
 	font-family:inherit;
 	font-size:inherit;
-	padding-left:12px;
+	padding-left:7px;
+	padding-right:7px;
 	width:100%;
 }
 tbody {

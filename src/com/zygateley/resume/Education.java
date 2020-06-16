@@ -160,10 +160,13 @@ public class Education {
 					EducationDetailBlock _record = _records.get(i);
 					
 					out.println("<tr>");
-					out.println("<td align=left valign=top style=\"width:125px;\" class=\"SubSubHeader NoWrap\">");
+					out.println("<td align=left valign=top style=\"width:10px;\" class=\"SubSubHeader NoWrap\">");
 					out.print(_record.DEGREE_TYPE);
+					if (_record.DEGREE_SUBJECT != null && !_record.DEGREE_SUBJECT.isEmpty()) {
+						out.print(",");
+					}
 					out.print("</td>");
-					out.println("<td align=left valign=top style=\"width:170px;\" class=\"SubSubHeader NoWrap\">");
+					out.println("<td align=left valign=top style=\"width:10px;\" class=\"SubSubHeader NoWrap\">");
 					out.println("&nbsp;&nbsp;" + _record.DEGREE_SUBJECT + "&nbsp;&nbsp;");
 					out.println("</td>");
 					if (_record.GPA != null && !_record.GPA.isBlank() || 
