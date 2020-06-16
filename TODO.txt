@@ -1,3 +1,4 @@
+Move Education, Experience, Skills to views (jsp)
 Details
 	alignment of Degree type, multiple organizations
 	verify date order

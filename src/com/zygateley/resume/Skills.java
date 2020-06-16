@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.servlet.*;
 import javax.servlet.http.*;
 
 // Mirrors a single record in Skill table
@@ -43,6 +42,10 @@ public class Skills {
 		ResultSet results = statement.executeQuery(Skills.query);
 		
 		try {
+			out.println("<table border=0 cellspacing=0 cellpadding=0>");
+			out.println("<tbody>");
+			out.println("<tr>");
+			out.println("<td align=left valign=top>");
 			while (results.next()) {
 				int ID = results.getInt("ID");
 				String TITLE = results.getString("TITLE");
@@ -54,6 +57,7 @@ public class Skills {
 				out.println("</label>");
 				out.println("<br />");
 			}
+			out.println("</td></tr></tbody></table>");
 		}
 		catch (Exception err) {
 			System.out.println("ERROR: " + err.getMessage());

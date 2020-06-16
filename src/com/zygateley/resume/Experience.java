@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.servlet.*;
 import javax.servlet.http.*;
 
 // Mirrors a single record in Experience table
@@ -25,7 +24,7 @@ class ExperienceBlock {
 		this.LOCATION = results.getString("LOCATION");
 		this.TITLE = results.getString("TITLE");
 		this.URL = results.getString("URL");
-		this.DATE_START = results.getString("DATE_END");
+		this.DATE_START = results.getString("DATE_START");
 		this.DATE_END = results.getString("DATE_END");
 	}
 }
@@ -44,7 +43,7 @@ class ExperienceDetailBlock {
 
 
 public class Experience {
-	private static final String query = "SELECT * FROM Experience ORDER BY ID DESC";
+	private static final String query = "SELECT * FROM Experience ORDER BY DATE_END DESC";
 	private static final String embeddedQuery = "SELECT * FROM ExperienceDetail WHERE EXPERIENCE_ID=? ORDER BY ID DESC"; 
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
@@ -144,10 +143,10 @@ public class Experience {
 			out.println("</td>");
 			out.println("<td align=left valign=top class=\"SubSubHeader NoWrap Right\">");
 			if (record.DATE_START != null && !record.DATE_START.isBlank()) {
-				out.println(record.DATE_START);
+				out.println(SQLite.formateSQLiteDate(record.DATE_START));
 				out.println("–");
 			}
-			out.println(record.DATE_END);
+			out.println(SQLite.formateSQLiteDate(record.DATE_END));
 			out.println("</td>");
 			out.println("</tr>");
 			

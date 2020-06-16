@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.servlet.*;
 import javax.servlet.http.*;
 
 // Mirrors a single record in Education table
@@ -46,18 +45,22 @@ class EducationDetailBlock {
 
 
 public class Education {
-	private static final String query = "SELECT * FROM Education ORDER BY ID DESC";
-	private static final String embeddedQuery = "SELECT * FROM EducationDetail WHERE EDUCATION_ID=? ORDER BY ID DESC"; 
+	private static final String query = "SELECT Education.*, EducationDetail.END_DATE FROM Education LEFT OUTER JOIN EducationDetail ON Education.ID = EducationDetail.ID ORDER BY EducationDetail.END_DATE DESC";
+	private static final String embeddedQuery = "SELECT * FROM EducationDetail WHERE EDUCATION_ID=? ORDER BY END_DATE DESC"; 
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
 		ResultSet results = statement.executeQuery(Education.query);
 		
 		try {
+			out.println("<table border=0 cellspacing=0 cellpadding=0>");
+			out.println("<tbody>");
+			out.println("<tr>");
+			out.println("<td align=left valign=top>");
 			while (results.next()) {
 				int ID = results.getInt("ID");
 				String ORGANIZATION = results.getString("ORGANIZATION");
-				out.println("<label class=\"SubSubHeader\">");
+				out.println("<label class=\"SubHeader\">");
 				out.println(String.format(
 						"<input type=\"checkbox\" name=\"EDUCATION_ID\" value=\"%d\">%s</option>",
 						ID, ORGANIZATION)
@@ -65,6 +68,7 @@ public class Education {
 				out.println("</label>");
 				out.println("<br />");
 			}
+			out.println("</td></tr></tbody></table>");
 		}
 		catch (Exception err) {
 			System.out.println("ERROR: " + err.getMessage());
@@ -156,15 +160,15 @@ public class Education {
 					EducationDetailBlock _record = _records.get(i);
 					
 					out.println("<tr>");
-					out.println("<td align=left valign=top class=\"SubSubHeader NoWrap\">");
+					out.println("<td align=left valign=top style=\"width:125px;\" class=\"SubSubHeader NoWrap\">");
 					out.print(_record.DEGREE_TYPE);
 					out.print("</td>");
-					out.println("<td align=left valign=top class=\"SubSubHeader NoWrap\">");
+					out.println("<td align=left valign=top style=\"width:170px;\" class=\"SubSubHeader NoWrap\">");
 					out.println("&nbsp;&nbsp;" + _record.DEGREE_SUBJECT + "&nbsp;&nbsp;");
 					out.println("</td>");
 					if (_record.GPA != null && !_record.GPA.isBlank() || 
 							_record.LATIN_HONORS != null && !_record.LATIN_HONORS.isBlank()) {
-						out.println("<td align=center valign=top>");
+						out.println("<td align=center valign=top style=\"width:10px;\">");
 						out.println("—");
 						out.println("</td>");
 						out.println("<td align=left valing=top class=\"NoWrap\">");
@@ -181,11 +185,11 @@ public class Education {
 						}
 						out.println("</td>");
 					}
-					out.println("<td align=left valign=top style=\"width:50%;\" class=\"SubSubHeader Right\">");
+					out.println("<td align=left valign=top class=\"SubSubHeader Right\">");
 					if (_record.IS_EXPECTED) {
 						out.print("Expected ");
 					}
-					out.println(_record.END_DATE);
+					out.println(SQLite.formateSQLiteDate(_record.END_DATE));
 					out.println("</td>");
 					out.println("</tr>");
 					

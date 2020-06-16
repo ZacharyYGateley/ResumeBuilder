@@ -2,6 +2,9 @@ package com.zygateley.resume;
 
 
 import java.sql.*;
+import java.time.*;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 
 public class SQLite {
@@ -77,6 +80,24 @@ public class SQLite {
     	}
     	return null;
     }
+    
+
+	/**
+	 * convertStringToDate
+	 * 
+	 * Dates are stored in SQLite as yyyy-mm
+	 * Convert to date string Mon yyyy
+	 * 
+	 * @param date string yyyy-mm
+	 * @returns date string Mon yyyy
+	 */
+	public static String formateSQLiteDate(String sqliteDate) {
+		int yyyy = Integer.parseInt(sqliteDate.substring(0, 4));
+		int mm = Integer.parseInt(sqliteDate.substring(5, 7));
+		LocalDate date = LocalDate.of(yyyy, mm, 1);
+		Month mon = date.getMonth();
+		return mon.getDisplayName(TextStyle.FULL, Locale.US) + " " + yyyy;
+	}
     
     
     /**
