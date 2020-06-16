@@ -14,7 +14,7 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 	Experience.Section record = experienceList.get(experienceIndex);
 	String dateString = "";
 	if (record.START_DATE != null && !record.START_DATE.isBlank()) {
-		dateString += SQLite.formateSQLiteDate(record.START_DATE) + "&ndash;";
+		dateString += SQLite.formateSQLiteDate(record.START_DATE) + "&nbsp;&ndash;&nbsp;";
 	}
 	dateString += SQLite.formateSQLiteDate(record.END_DATE);
 %>
@@ -29,7 +29,7 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 		</tr>
 		
 		<tr>
-			<td align=left valign=top class="SubSubHeader NoWrap">
+			<td align=left valign=top class="SubSubHeader JobTitle NoWrap">
 				<%= record.TITLE %>
 			</td>
 			<td align=left valign=top class="SubSubHeader NoWrap Right">

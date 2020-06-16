@@ -12,10 +12,10 @@ public class Experience {
 	private static final String QUERY = "SELECT * FROM Experience ORDER BY END_DATE DESC";
 	private static final String QUERY_FULL = 
 			"SELECT e.*, \r\n" + 
-			"ed.SORT_ORDER, ed.TEXT \r\n" + 
+			"ed.SORT_ORDER as ED_SORT_ORDER, ed.TEXT \r\n" + 
 			"FROM ExperienceDetail AS ed JOIN Experience AS e\r\n" + 
 			"ON e.ID=ed.EXPERIENCE_ID \r\n" + 
-			"ORDER BY e.END_DATE DESC, ed.SORT_ORDER ASC";
+			"ORDER BY e.SORT_ORDER DESC, ed.SORT_ORDER ASC";
 	
 	// Mirrors a single record in Experience table
 	public static class Section {

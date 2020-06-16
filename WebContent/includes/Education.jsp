@@ -42,8 +42,11 @@ for (int educationIndex = 0; educationIndex < educationCount; educationIndex++) 
 		
 		<tr>
 			<td align=left valign=top style="width:10px;" class="SubSubHeader NoWrap">
-				<%= detail.DEGREE_TYPE %>
-				<%= (!detail.DEGREE_TYPE.isBlank()) ? "," : "" %>
+				<%= 
+					detail.DEGREE_TYPE 
+				%><%= 
+					(!detail.DEGREE_TYPE.isBlank()) ? "," : "" 
+				%>
 			</td>
 			<td align=left valign=top style="width:10px;" class="SubSubHeader NoWrap">
 				&nbsp;&nbsp;<%= detail.DEGREE_SUBJECT %>&nbsp;&nbsp;
