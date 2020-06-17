@@ -1,1 +1,3 @@
 getEducationSet, get*Set all are almost identical. Can combine into one method?
+select all/none buttons
+select specific details from skill sets

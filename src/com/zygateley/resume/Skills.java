@@ -11,7 +11,6 @@ import javax.servlet.http.*;
 
 
 public class Skills {
-	private static final String QUERY = "SELECT * FROM Skills";
 	private static final String QUERY_FULL = 
 			"SELECT s.ID, s.TITLE, \r\n" + 
 			"sd.ID as DETAIL_ID, sd.SKILLS_ID,\r\n" + 
@@ -53,23 +52,46 @@ public class Skills {
 	
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Skills.QUERY);
+		ResultSet results = statement.executeQuery(Skills.QUERY_FULL);
 		
 		try {
 			out.println("<table border=0 cellspacing=0 cellpadding=0>");
 			out.println("<tbody>");
 			out.println("<tr>");
 			out.println("<td align=left valign=top>");
+			int skillIndex = -1;
 			while (results.next()) {
 				int ID = results.getInt("ID");
-				String TITLE = results.getString("TITLE");
-				out.println("<label class=\"SubSubHeader\">");
+				if (skillIndex != ID) {
+					if (skillIndex > -1) {
+						out.println("</p>");
+					}
+					String TITLE = results.getString("TITLE");
+					out.println("<label class=\"SubSubHeader\">");
+					out.println(String.format(
+							"<input type=\"checkbox\" name=\"SKILL_ID\" value=\"%d\" " +
+							"onclick=\"selectMultiple(this.checked, \'data-parent\', \'%d\');\"" +
+							">%s</option>",
+							ID, ID, TITLE)
+						);
+					out.println("</label>");
+					out.println("<p>");
+					
+					skillIndex = ID;
+				}
+				int DETAIL_ID = results.getInt("DETAIL_ID");
+				String DETAIL_TITLE = results.getString("DETAIL_TITLE");
+				String PROFICIENCY = Skills.proficiencyIntegerToString(results.getInt("PROFICIENCY"));
+				out.println("<label>");
 				out.println(String.format(
-						"<input type=\"checkbox\" name=\"SKILL_ID\" value=\"%d\">%s</option>",
-						ID, TITLE)
+						"<input type=\"checkbox\" data-parent=\"%d\"name=\"SKILL_DETAIL_ID\" value=\"%d\">%s (%s)</option>",
+						ID, DETAIL_ID, DETAIL_TITLE, PROFICIENCY)
 					);
 				out.println("</label>");
 				out.println("<br />");
+			}
+			if (skillIndex > -1) {
+				out.println("</p>");
 			}
 			out.println("</td></tr></tbody></table>");
 		}

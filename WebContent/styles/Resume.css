@@ -115,3 +115,11 @@ ul {
 	margin-top:0;
 	padding-inline-start:30px;
 }
+a {
+	padding-left:3px;
+	text-decoration:none;
+}
+p {
+	padding-left:20px;
+	margin:4px;
+}

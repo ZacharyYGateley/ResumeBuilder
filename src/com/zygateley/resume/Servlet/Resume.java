@@ -51,7 +51,7 @@ public class Resume extends HttpServlet {
 		
 		
 		// Output header
-		RequestDispatcher dispatch = request.getRequestDispatcher("/includes/header.html");
+		RequestDispatcher dispatch = request.getRequestDispatcher("includes/Header.html");
 		dispatch.include(request, response);
 		
 		
