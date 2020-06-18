@@ -1,6 +1,6 @@
 <%@page import="com.zygateley.resume.*,java.util.ArrayList" %> 
 
-<div class="Header">EDUCATION</div>
+<div class="Header">Education</div>
 
 <table border=0 cellspacing=0 cellpadding=0>
 	<tbody>

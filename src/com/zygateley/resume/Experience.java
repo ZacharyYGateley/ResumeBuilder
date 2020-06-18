@@ -9,13 +9,20 @@ import javax.servlet.http.*;
 
 
 public class Experience {
-	private static final String QUERY = "SELECT * FROM Experience ORDER BY END_DATE DESC";
+	private static final String QUERY = 
+			"SELECT e.*, eh.HEADER " + 
+			"FROM Experience AS e JOIN ExperienceHeader AS eh " +
+			"ON e.HEADER_ID=eh.ID " +
+			"ORDER BY eh.SORT_ORDER, e.SORT_ORDER DESC";
 	private static final String QUERY_FULL = 
 			"SELECT e.*, \r\n" + 
-			"ed.SORT_ORDER as ED_SORT_ORDER, ed.TEXT \r\n" + 
-			"FROM ExperienceDetail AS ed JOIN Experience AS e\r\n" + 
+			"ed.SORT_ORDER as ED_SORT_ORDER, ed.TEXT, \r\n" + 
+			"eh.SORT_ORDER as EH_SORT_ORDER, eh.HEADER \r\n" + 
+			"FROM ExperienceDetail AS ed JOIN Experience AS e \r\n" + 
 			"ON e.ID=ed.EXPERIENCE_ID \r\n" + 
-			"ORDER BY e.SORT_ORDER DESC, ed.SORT_ORDER ASC";
+			"JOIN ExperienceHeader AS eh \r\n" + 
+			"ON eh.ID=e.HEADER_ID \r\n" + 
+			"ORDER BY eh.SORT_ORDER, e.SORT_ORDER DESC, ed.SORT_ORDER ASC";
 	
 	// Mirrors a single record in Experience table
 	public static class Section {
@@ -28,7 +35,8 @@ public class Experience {
 		}
 		
 		public final int ID;
-		public final String TYPE;
+		public final int HEADER_ID;
+		public final String HEADER;
 		public final String ORGANIZATION;
 		public final String LOCATION;
 		public final String TITLE;
@@ -38,7 +46,8 @@ public class Experience {
 		public ArrayList<Experience.Section.Detail> details;
 		public Section(ResultSet results) throws SQLException {
 			this.ID = results.getInt("ID");
-			this.TYPE = results.getString("TYPE");
+			this.HEADER_ID = results.getInt("HEADER_ID");
+			this.HEADER = results.getString("HEADER");
 			this.ORGANIZATION = results.getString("ORGANIZATION");
 			this.LOCATION = results.getString("LOCATION");
 			this.TITLE = results.getString("TITLE");
@@ -54,14 +63,32 @@ public class Experience {
 		}
 	}
 	
-	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
-		Statement statement = database.createStatement();
-		ResultSet results = statement.executeQuery(Experience.QUERY);
+	public static void writeFormOptions(
+			HttpServletRequest request, 
+			HttpServletResponse response, 
+			SQLite database, 
+			PrintWriter out
+			) throws IOException, SQLException {
+		PreparedStatement statement = database.prepareStatement(Experience.QUERY);
+		ResultSet results = statement.executeQuery();
 		
 		try {
-			out.println("<table border=0 cellpadding=0 cellspacing=0>");
-			out.println("<tbody>");
+			int headerId = -1;
 			while (results.next()) {
+				int HEADER_ID = results.getInt("HEADER_ID");
+				if (headerId != HEADER_ID) {
+					if (headerId > -1) {
+						out.println("</tbody>");
+						out.println("</table>");
+					}
+					
+					String HEADER = results.getString("HEADER");
+					out.println("<div class=\"Header\">" + HEADER + "</div>");
+					out.println("<table border=0 cellpadding=0 cellspacing=0>");
+					out.println("<tbody>");
+					
+					headerId = HEADER_ID;
+				}
 				out.println("<tr>");
 				out.println("<td align=left valign=middle>");
 				
@@ -120,8 +147,8 @@ public class Experience {
 			// Return array
 			experienceList = new ArrayList<Experience.Section>();
 			
-			Statement statement = database.createStatement();
-			ResultSet results = statement.executeQuery(Experience.QUERY_FULL);
+			PreparedStatement statement = database.prepareStatement(Experience.QUERY_FULL);
+			ResultSet results = statement.executeQuery();
 			
 			try {
 				int experienceId = -1;

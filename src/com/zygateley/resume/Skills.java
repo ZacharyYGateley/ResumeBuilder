@@ -55,37 +55,40 @@ public class Skills {
 		ResultSet results = statement.executeQuery(Skills.QUERY_FULL);
 		
 		try {
+			out.println("<div class=\"Header\">Skills</div>");
 			out.println("<table border=0 cellspacing=0 cellpadding=0>");
 			out.println("<tbody>");
 			out.println("<tr>");
 			out.println("<td align=left valign=top>");
 			int skillIndex = -1;
 			while (results.next()) {
-				int ID = results.getInt("ID");
-				if (skillIndex != ID) {
+				int SKILL_ID = results.getInt("ID");
+				if (skillIndex != SKILL_ID) {
 					if (skillIndex > -1) {
 						out.println("</p>");
 					}
 					String TITLE = results.getString("TITLE");
 					out.println("<label class=\"SubSubHeader\">");
 					out.println(String.format(
-							"<input type=\"checkbox\" name=\"SKILL_ID\" value=\"%d\" " +
+							"<input type=\"checkbox\" data-skill-id=\"%d\" name=\"SKILL_ID\" value=\"%d\" " +
 							"onclick=\"selectMultiple(this.checked, \'data-parent\', \'%d\');\"" +
 							">%s</option>",
-							ID, ID, TITLE)
+							SKILL_ID, SKILL_ID, SKILL_ID, TITLE)
 						);
 					out.println("</label>");
 					out.println("<p>");
 					
-					skillIndex = ID;
+					skillIndex = SKILL_ID;
 				}
 				int DETAIL_ID = results.getInt("DETAIL_ID");
 				String DETAIL_TITLE = results.getString("DETAIL_TITLE");
 				String PROFICIENCY = Skills.proficiencyIntegerToString(results.getInt("PROFICIENCY"));
 				out.println("<label>");
 				out.println(String.format(
-						"<input type=\"checkbox\" data-parent=\"%d\"name=\"SKILL_DETAIL_ID\" value=\"%d\">%s (%s)</option>",
-						ID, DETAIL_ID, DETAIL_TITLE, PROFICIENCY)
+						"<input type=\"checkbox\" data-parent=\"%d\" " +  
+						"name=\"SKILL_DETAIL_ID\" value=\"%d\" " + 
+						"onclick=\"if(!this.checked)return;selectMultiple(this.checked, 'data-skill-id', '%d');\">%s (%s)</option>",
+						SKILL_ID, DETAIL_ID, SKILL_ID, DETAIL_TITLE, PROFICIENCY)
 					);
 				out.println("</label>");
 				out.println("<br />");
@@ -126,6 +129,11 @@ public class Skills {
 					.map(s -> Integer.parseInt(s))
 					.collect(Collectors.toList())
 					);
+			ArrayList<Integer> includedSkillDetailsById = new ArrayList<>(
+					Arrays.stream(request.getParameterValues("SKILL_DETAIL_ID"))
+					.map(s -> Integer.parseInt(s))
+					.collect(Collectors.toList())
+					);
 	
 			// Return array
 			skillList = new ArrayList<Skills.Section>();
@@ -138,7 +146,8 @@ public class Skills {
 				Skills.Section skill = null;
 				while (results.next()) {
 					int id = results.getInt("ID");
-					if (!includedSkillsById.contains(id)) {
+					int detail_id = results.getInt("DETAIL_ID");
+					if (!includedSkillsById.contains(id) || !includedSkillDetailsById.contains(detail_id)) {
 						continue;
 					}
 					if (skillId != id) {

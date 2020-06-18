@@ -69,6 +69,7 @@ public class Education {
 		ResultSet results = statement.executeQuery(Education.QUERY);
 		
 		try {
+			out.println("<div class=\"Header\">Education</div>");
 			out.println("<table border=0 cellspacing=0 cellpadding=0>");
 			out.println("<tbody>");
 			out.println("<tr>");

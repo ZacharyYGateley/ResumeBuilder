@@ -11,7 +11,6 @@
  * @returns
  */
 function selectMultiple(noneOrAll, fieldName, fieldValue) {
-	
 	let forms = document.getElementsByTagName('form');
 	if (!forms || !forms.length) {
 		return;

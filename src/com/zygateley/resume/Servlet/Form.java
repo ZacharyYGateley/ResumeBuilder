@@ -60,15 +60,13 @@ public class Form extends HttpServlet {
 			out.println("<form method=\"get\" action=\"/Resume/resume.jsp\">");
 			
 			// EDUCATION
-			out.println("<div class=\"Header\">Education</div>");
 			Education.writeFormOptions(request, response, database, out);
 			
 			// EXPERIENCE
-			out.println("<div class=\"Header\">Experience</div>");
+			// Outputs appropriate headers
 			Experience.writeFormOptions(request, response, database, out);
 			
 			// SKILLS
-			out.println("<div class=\"Header\">Skills</div>");
 			Skills.writeFormOptions(request,  response,  database, out);
 			
 			// SUBMIT

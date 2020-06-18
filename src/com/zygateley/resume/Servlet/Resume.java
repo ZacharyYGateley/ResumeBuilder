@@ -57,16 +57,12 @@ public class Resume extends HttpServlet {
 		
 		// EDUCATION
 		if (request.getParameter("EDUCATION_ID") != null) {
-			//out.println("<div class=\"Header\">EDUCATION</div>");
-			//Education.writeOutput(request, response, database, out);
 			dispatch = request.getRequestDispatcher("/includes/Education.jsp");
 			dispatch.include(request, response);
 		}
 		
 		// EXPERIENCE
 		if (request.getParameter("EXPERIENCE_ID") != null) {
-			//out.println("<div class=\"Header\">EXPERIENCE</div>");
-			//Experience.writeOutput(request, response, database, out);
 			dispatch = request.getRequestDispatcher("/includes/Experience.jsp");
 			dispatch.include(request, response);
 		}

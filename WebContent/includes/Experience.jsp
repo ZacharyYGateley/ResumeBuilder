@@ -1,17 +1,36 @@
 <%@page import="com.zygateley.resume.*,java.util.ArrayList" %> 
 
-<div class="Header">EXPERIENCE</div>
 
-<table border=0 cellspacing=0 cellpadding=0>
-	<tbody>
 
 <%
 	// Get experience set from Experience class
 // 		(.getExperienceSet opens and closes database)
 ArrayList<Experience.Section> experienceList = Experience.getExperienceList(request,  response);
+int headerId = -1;
 int experienceCount = experienceList.size();
 for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex++) {
 	Experience.Section record = experienceList.get(experienceIndex);
+	
+	if (headerId != record.HEADER_ID) {
+		if (headerId > -1) {
+			%>	
+
+	</tbody>
+</table>
+
+			<%
+		}
+		%>
+		
+<div class="Header"><%= record.HEADER %></div>
+
+<table border=0 cellspacing=0 cellpadding=0>
+	<tbody>
+		
+		<%
+		headerId = record.HEADER_ID;
+	}
+	
 	String dateString = "";
 	if (record.START_DATE != null && !record.START_DATE.isBlank()) {
 		dateString += SQLite.formateSQLiteDate(record.START_DATE) + "&nbsp;&ndash;&nbsp;";
