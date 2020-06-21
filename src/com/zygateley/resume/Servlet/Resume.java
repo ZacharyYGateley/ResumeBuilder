@@ -51,30 +51,30 @@ public class Resume extends HttpServlet {
 		
 		
 		// Output header
-		RequestDispatcher dispatch = request.getRequestDispatcher("includes/Header.html");
+		RequestDispatcher dispatch = request.getRequestDispatcher("views/Header.html");
 		dispatch.include(request, response);
 		
 		
 		// EDUCATION
 		if (request.getParameter("EDUCATION_ID") != null) {
-			dispatch = request.getRequestDispatcher("/includes/Education.jsp");
+			dispatch = request.getRequestDispatcher("views/Education.jsp");
 			dispatch.include(request, response);
 		}
 		
 		// EXPERIENCE
 		if (request.getParameter("EXPERIENCE_ID") != null) {
-			dispatch = request.getRequestDispatcher("/includes/Experience.jsp");
+			dispatch = request.getRequestDispatcher("views/Experience.jsp");
 			dispatch.include(request, response);
 		}
 		
 		// SKILLS
 		if (request.getParameter("SKILL_ID") != null) { 
-			dispatch = request.getRequestDispatcher("/includes/Skills.jsp");
+			dispatch = request.getRequestDispatcher("views/Skills.jsp");
 			dispatch.include(request, response);
 		}
 		
 		
-		// Finish html bosy
+		// Finish html body
 		out.println("</div>");
 		out.println("</body>");
 		out.println("</html>");			

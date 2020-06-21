@@ -45,19 +45,19 @@ public class Form extends HttpServlet {
 		out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"styles/Resume.css\" />");
 		out.println("<title>Resume - Zach Gateley</title>");
 		out.println("</head>");
-		out.println("<body style=\"margin:0;\">");
+		out.println("<body style=\"margin:0;\" onload=\"selectMultiple(true);\">");
 		out.println("<div class=\"Body\">");
 		
 		// Output header
-		RequestDispatcher dispatch = request.getRequestDispatcher("includes/Header.html");
+		RequestDispatcher dispatch = request.getRequestDispatcher("views/Header.html");
 		dispatch.include(request, response);
 		
 		try {
 			// Form manipulation buttons
-			dispatch = request.getRequestDispatcher("/includes/FormManipulation.html");
+			dispatch = request.getRequestDispatcher("views/FormManipulation.html");
 			dispatch.include(request, response);
 			
-			out.println("<form method=\"get\" action=\"/Resume/resume.jsp\">");
+			out.println("<form method=\"get\" action=\"resume.jsp\">");
 			
 			// EDUCATION
 			Education.writeFormOptions(request, response, database, out);
@@ -70,8 +70,9 @@ public class Form extends HttpServlet {
 			Skills.writeFormOptions(request,  response,  database, out);
 			
 			// SUBMIT
-			out.println("<div style=\"text-align:center;\">");
+			out.println("<div style=\"text-align:center;margin-bottom:40px;\">");
 			out.println("<input type=\"Submit\" value=\"Submit\">");
+			out.println("</div>");
 			out.println("</form>");
 		} catch (SQLException e) {
 			e.printStackTrace();

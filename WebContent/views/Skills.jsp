@@ -20,16 +20,17 @@ for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 			</td>
 
 	<%
-		// Make details more readily available
-		ArrayList<Skills.Section.Detail> detailSet = record.details;
-		int detailCount = detailSet.size();
-		int detailIndex = 0;
+	// Make details more readily available
+	ArrayList<Skills.Section.Detail> detailSet = record.details;
+	int detailCount = detailSet.size();
+	int detailIndex = 0;
+	
+	// Skills are cut into columns (SECTION_COUNT)
+	int perColumn = (int) (Math.ceil(detailCount / (double) Skills.SECTION_COUNT));
+	OUTER_LOOP: for (int column = 0; column < Skills.SECTION_COUNT; column++) {
 		
-		// Skills are cut into columns (SECTION_COUNT)
-		int perColumn = (int) (Math.ceil(detailCount / (double) Skills.SECTION_COUNT));
-		OUTER_LOOP: for (int column = 0; column < Skills.SECTION_COUNT; column++) {
-			// Last column should span the rest of the columns
-			boolean isMultispan = (detailIndex == Skills.SECTION_COUNT - 1);
+		// Last column should span the rest of the columns
+		boolean isMultispan = (detailIndex + perColumn >= detailCount);
 	%>
 			
 			<td align=left valign=top class="OtherSkillsTop NoWrap 
@@ -39,12 +40,8 @@ for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 				<ul class="List<%=(detailIndex % 2)%>">
 
 		<%
-			// Output specific skills (details)
-				for (int i = 0; i < perColumn; i++, detailIndex++) {
-			// Check to make sure not all skills have yet been output
-			if (detailIndex >= detailCount) {
-				break OUTER_LOOP;
-			}
+		// Output specific skills (details)
+		for (int i = 0; i < perColumn; i++, detailIndex++) {
 			Skills.Section.Detail detail = detailSet.get(detailIndex);
 		%>
 				
@@ -56,6 +53,10 @@ for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 					</li>
 					
 			<%
+			// Check to make sure not all skills have yet been output
+			if (detailIndex + 1 >= detailCount) {
+				break OUTER_LOOP;
+			}
 		}
 		%>
 		

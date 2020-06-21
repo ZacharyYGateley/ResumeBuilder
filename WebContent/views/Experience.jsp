@@ -35,7 +35,9 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 	if (record.START_DATE != null && !record.START_DATE.isBlank()) {
 		dateString += SQLite.formateSQLiteDate(record.START_DATE) + "&nbsp;&ndash;&nbsp;";
 	}
-	dateString += SQLite.formateSQLiteDate(record.END_DATE);
+	if (record.END_DATE != null && !record.END_DATE.isBlank()) {
+		dateString += SQLite.formateSQLiteDate(record.END_DATE);
+	}
 %>
 
 		<tr>

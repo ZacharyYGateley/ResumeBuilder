@@ -9,7 +9,7 @@ import java.util.Locale;
 
 public class SQLite {
 	private Connection connection;
-	private String url = "jdbc:sqlite:C:\\Users\\Zachary Gateley\\Dropbox\\Languages\\Java\\Resume\\CV.db";
+	private String url = "jdbc:sqlite:/path/to/working/directory/CV.db";
 	
 	/**
 	 * Create a new connection object 
