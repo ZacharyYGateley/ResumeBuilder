@@ -7,7 +7,7 @@ When SQLite.java is run, it will be run from your local server (e.g. Apache), wh
 
 <br />
 
-![SQLite.java: update line at "private String url" declaration](images/SQLite_url.png)
+![SQLite.java: update line at "private String url" declaration](images/SQLite_url.PNG)
 
 <br />
 
@@ -15,7 +15,7 @@ Now for the good stuff! When CV.db is populated (via a third-party application),
 
 <br />
 
-![HTML form with your available components](images/Form.png)
+![HTML form with your available components](images/Form.PNG)
 
 <br />
 
@@ -23,7 +23,7 @@ Just choose what you would like and click submit. It will show up appropriately 
 
 <br />
 
-![Your resume is ready](images/Resume.png)
+![Your resume is ready](images/Resume.PNG)
 
 <br />
 
