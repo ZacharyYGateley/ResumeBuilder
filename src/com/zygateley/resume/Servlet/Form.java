@@ -49,12 +49,12 @@ public class Form extends HttpServlet {
 		out.println("<div class=\"Body\">");
 		
 		// Output header
-		RequestDispatcher dispatch = request.getRequestDispatcher("views/Header.html");
+		RequestDispatcher dispatch = request.getRequestDispatcher("WEB-INF/views/Header.html");
 		dispatch.include(request, response);
 		
 		try {
 			// Form manipulation buttons
-			dispatch = request.getRequestDispatcher("views/FormManipulation.html");
+			dispatch = request.getRequestDispatcher("WEB-INF/views/FormManipulation.html");
 			dispatch.include(request, response);
 			
 			out.println("<form method=\"get\" action=\"resume.jsp\">");

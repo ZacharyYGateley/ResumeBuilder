@@ -20,9 +20,10 @@ import javax.servlet.http.*;
  * @author Zachary Gateley
  *
  */
+
 public class SQLite {
 	private Connection connection;
-	private String url = "jdbc:sqlite:/path/to/working/directory/CV.db";
+	private String url = "jdbc:sqlite:/path/to/your/database/CV.db";
 
 	/**
 	 * Section

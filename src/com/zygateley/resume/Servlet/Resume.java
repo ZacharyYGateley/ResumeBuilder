@@ -1,8 +1,6 @@
 package com.zygateley.resume.Servlet;
 
 import java.io.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
@@ -44,32 +42,34 @@ public class Resume extends HttpServlet {
 		out.println("<head>");
 		out.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
 		out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"styles/Resume.css\" />");
+		out.println("<script type=\"text/javascript\" src=\"scripts/Resume.js\"></script>");
 		out.println("<title>Resume - Zach Gateley</title>");
 		out.println("</head>");
-		out.println("<body style=\"margin:0;\">");
+		// cleanupResumeStyle from Resume.js
+		out.println("<body style=\"margin:0;\" onload=\"cleanupResumeStyle()\">");
 		out.println("<div class=\"Body\">");
 		
 		
 		// Output header
-		RequestDispatcher dispatch = request.getRequestDispatcher("views/Header.html");
+		RequestDispatcher dispatch = request.getRequestDispatcher("WEB-INF/views/Header.html");
 		dispatch.include(request, response);
 		
 		
 		// EDUCATION
 		if (request.getParameter("EDUCATION_ID") != null) {
-			dispatch = request.getRequestDispatcher("views/Education.jsp");
+			dispatch = request.getRequestDispatcher("WEB-INF/views/Education.jsp");
 			dispatch.include(request, response);
 		}
 		
 		// EXPERIENCE
 		if (request.getParameter("EXPERIENCE_ID") != null) {
-			dispatch = request.getRequestDispatcher("views/Experience.jsp");
+			dispatch = request.getRequestDispatcher("WEB-INF/views/Experience.jsp");
 			dispatch.include(request, response);
 		}
 		
 		// SKILLS
 		if (request.getParameter("SKILL_ID") != null) { 
-			dispatch = request.getRequestDispatcher("views/Skills.jsp");
+			dispatch = request.getRequestDispatcher("WEB-INF/views/Skills.jsp");
 			dispatch.include(request, response);
 		}
 		
