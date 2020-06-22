@@ -24,7 +24,6 @@ public class SQLite {
 	private Connection connection;
 	private String url = "jdbc:sqlite:/path/to/working/directory/CV.db";
 
-	// Mirrors a single record in the top-level tables
 	/**
 	 * Section
 	 * 
