@@ -9,7 +9,7 @@ The styling is quite static right now. However, it is modular, so with a little 
 
 ## Installation
 
-First thing is first. When cloning to your local machine, ``sqlite-jdbc-*.jar`` is included in the root folder of the project. You may wish to update it. 
+First thing is first. When cloning to your local machine, the latest SQLite JDBC jar file, ``sqlite-jdbc-*.jar``, is included in ``WEB-INF/lib/`` of the project. You may wish to update it.
 In order to access your database, you must update SQLite.java with the correct URL to your SQLite database CV.db.
 When SQLite.java is run, it will be run from your local server (e.g. Apache), which has a specific workspace. It may be easiest to hard-code an absolute URL from your root directory. 
 
