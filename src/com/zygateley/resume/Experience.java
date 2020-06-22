@@ -1,14 +1,14 @@
 package com.zygateley.resume;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.*;
 
 
-public class Experience {
+public class Experience implements TopLevel {
 	private static final String QUERY = 
 			"SELECT e.*, eh.HEADER " + 
 			"FROM Experience AS e JOIN ExperienceHeader AS eh " +
@@ -16,6 +16,7 @@ public class Experience {
 			"ORDER BY eh.SORT_ORDER, e.SORT_ORDER DESC";
 	private static final String QUERY_FULL = 
 			"SELECT e.*, \r\n" + 
+			"ed.ID as DETAIL_ID, e.ID, " +
 			"ed.SORT_ORDER as ED_SORT_ORDER, ed.TEXT, \r\n" + 
 			"eh.SORT_ORDER as EH_SORT_ORDER, eh.HEADER \r\n" + 
 			"FROM ExperienceDetail AS ed JOIN Experience AS e \r\n" + 
@@ -24,45 +25,90 @@ public class Experience {
 			"ON eh.ID=e.HEADER_ID \r\n" + 
 			"ORDER BY eh.SORT_ORDER, e.SORT_ORDER DESC, ed.SORT_ORDER ASC";
 	
-	// Mirrors a single record in Experience table
-	public static class Section {
-		// Mirrors a single record in ExperienceDetail table
-		public static class Detail {
-			public final String TEXT;
-			public Detail(String text) {
-				this.TEXT = text;
+	/** 
+	 * Section extends SQLite.Section
+	 * 
+	 * Mirrors a single record in Experience table.
+	 * See SQLite.Section for more details.
+	 * 
+	 * @author Zachary Gateley
+	 *
+	 */
+	public static class Section extends SQLite.Section {
+		/**
+		 * Detail extends SQLite.Section.Detail
+		 * 
+		 * Mirrors a single record in ExperienceDetail table.
+		 * See SQLite.Section.Detail for more information.
+		 * 
+		 * @author Zachary Gateley
+		 *
+		 */
+		public static class Detail extends SQLite.Section.Detail {
+			/**
+			 * Detail
+			 * 
+			 * Constructor adds current line from ResultSet 
+			 * from SQL call to CV database using QUERY_FULL.
+			 * 
+			 * @param results ResultSet from statement execution
+			 * @throws SQLException
+			 */
+			public Detail(ResultSet results) throws SQLException {
+				super();
+				this.addFields(results, "TEXT");
 			}
 		}
-		
-		public final int ID;
-		public final int HEADER_ID;
-		public final String HEADER;
-		public final String ORGANIZATION;
-		public final String LOCATION;
-		public final String TITLE;
-		public final String URL;
-		public final String START_DATE;
-		public final String END_DATE;
-		public ArrayList<Experience.Section.Detail> details;
-		public Section(ResultSet results) throws SQLException {
-			this.ID = results.getInt("ID");
-			this.HEADER_ID = results.getInt("HEADER_ID");
-			this.HEADER = results.getString("HEADER");
-			this.ORGANIZATION = results.getString("ORGANIZATION");
-			this.LOCATION = results.getString("LOCATION");
-			this.TITLE = results.getString("TITLE");
-			this.URL = results.getString("URL");
-			this.START_DATE = results.getString("START_DATE");
-			this.END_DATE = results.getString("END_DATE");
-			this.details = new ArrayList<Experience.Section.Detail>();
+
+		/**
+		 * Section
+		 * 
+		 * super() creates private: 
+		 * 	HashMap<String, String> this.fields
+		 *  ArrayList<*.Detail> 	this.details
+		 * 
+		 * @param results SQL ResultSet from QUERY_FULL statement call. Current line will instantiate the Section. 
+		 * @throws NumberFormatException
+		 * @throws SQLException
+		 */
+		public Section(ResultSet results) throws NumberFormatException, SQLException {
+			super();
+			// Populates this.fields
+			this.addFields(
+					results,
+					"ID", "HEADER_ID", "HEADER", "ORGANIZATION", "LOCATION",
+					"TITLE", "URL", "START_DATE", "END_DATE"
+			);
 		}
 		
-		public void addDetail(String text) {
-			Experience.Section.Detail newDetail = new Experience.Section.Detail(text);
+		@Override
+		/**
+		 * addDetail
+		 * 
+		 * Must include results with pointer to current line
+		 * from SQL statement call of QUERY_FULL.
+		 * 
+		 * @param results SQL ResultSet from statement execution.
+		 */
+		public void addDetail(ResultSet results) throws SQLException {
+			Experience.Section.Detail newDetail = new Experience.Section.Detail(results);
 			this.details.add(newDetail);
 		}
 	}
 	
+	/**
+	 * writeFormOptions
+	 * 
+	 * Called from Form Servlet.
+	 * Writes checkboxes for available output options.
+	 * 
+	 * @param request HTTP request from Servlet
+	 * @param response HTTP response from Servlet
+	 * @param database SQLite object with open connection
+	 * @param out stream to which to write output
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static void writeFormOptions(
 			HttpServletRequest request, 
 			HttpServletResponse response, 
@@ -124,63 +170,54 @@ public class Experience {
 		return;
 	}
 	
-	public static ArrayList<Experience.Section> getExperienceList(
+	/**
+	 * getExperienceList
+	 * 
+	 * Return a list of Education.Section that represents
+	 * all of the data of this type to be output on this resume.
+	 * Called from Experience.jsp
+	 * 
+	 * @param request HTTP request from Servlet
+	 * @param response HTTP response from Servlet
+	 * @param QUERY_FULL appropriate SQL query. See TopLevel implementation for more details. 
+	 * @param includedId HTML form checkbox name to find which table IDs are included in output
+	 * @param includedDetailId HTML form checkbox name to find which table IDs are included in Detail output
+	 * @param SectionType Class from calling *.java, *.Section extends SQLite.Section 
+	 * 
+	 * @return ArrayList of Sections
+	 * 		Each section has an ArrayList of details.
+	 * 		Even though the SQL tables are join left with multiple records of top-level ID,
+	 * 		there is only one Section returned for each top-level ID.  
+	 * 
+	 * @throws SQLException
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 */
+	public static ArrayList<? extends SQLite.Section> getExperienceList(
 			HttpServletRequest request, 
 			HttpServletResponse response
-			) throws SQLException, IOException {
-
-		// Connect to database
-		SQLite database = new SQLite();
-		database.connect();
-		
-		// Return array
-		ArrayList<Experience.Section> experienceList = null;
-		
-		try {		
-			// Find which experiences should be output
-			ArrayList<Integer> includedExperienceById = new ArrayList<>(
-					Arrays.stream(request.getParameterValues("EXPERIENCE_ID"))
-					.map(s -> Integer.parseInt(s))
-					.collect(Collectors.toList())
-					);
-	
-			// Return array
-			experienceList = new ArrayList<Experience.Section>();
-			
-			PreparedStatement statement = database.prepareStatement(Experience.QUERY_FULL);
-			ResultSet results = statement.executeQuery();
-			
-			try {
-				int experienceId = -1;
-				Experience.Section experience = null;
-				while (results.next()) {
-					int id = results.getInt("ID");
-					if (!includedExperienceById.contains(id)) {
-						continue;
-					}
-					if (experienceId != id) {
-						// Ordered by ID
-						experienceId = id;
-						experience = new Experience.Section(results);
-						experienceList.add(experience);
-					}
-					// Add this detail to the selected experience
-					String text = results.getString("TEXT"); 
-					experience.addDetail(text);
-				}
-			}
-			finally {
-				if (statement != null) {
-					statement.close();
-				}
-			}
-		}
-		finally {
-			if (database != null) {
-				database.close();
-			}
-		}
-		
-		return experienceList;
+			) throws SQLException, 
+					IOException, 
+					InstantiationException, 
+					IllegalAccessException, 
+					IllegalArgumentException, 
+					InvocationTargetException, 
+					NoSuchMethodException, 
+					SecurityException, 
+					ClassNotFoundException {
+		return SQLite.getList(
+				request, 
+				response, 
+				Experience.QUERY_FULL, 
+				"EXPERIENCE_ID", 
+				"EXPERIENCE_DETAIL_ID",
+				Experience.Section.class
+				);
 	}
 }

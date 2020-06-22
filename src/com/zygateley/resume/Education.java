@@ -1,14 +1,14 @@
 package com.zygateley.resume;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.*;
 
 
-public class Education {
+public class Education implements TopLevel {
 	private static final String QUERY = "SELECT Education.*, EducationDetail.END_DATE FROM Education LEFT OUTER JOIN EducationDetail ON Education.ID = EducationDetail.ID ORDER BY EducationDetail.END_DATE DESC";
 	private static final String QUERY_FULL = 
 			"SELECT e.*, " + 
@@ -21,49 +21,94 @@ public class Education {
 			"ON e.ID=ed.EDUCATION_ID " +
 			"ORDER BY ed.END_DATE DESC";
 	
-	// Mirrors a single record in Education table
-	public static class Section {
-		// Mirrors a single record in EducationDetail table
-		public static class Detail {
-			public final int ID;
-			public final int EDUCATION_ID;
-			public final String END_DATE;
-			public final boolean IS_EXPECTED;
-			public final String DEGREE_TYPE;
-			public final String DEGREE_SUBJECT;
-			public final String GPA;
-			public final String LATIN_HONORS;
-			public final String DETAILS;
+	/** 
+	 * Section extends SQLite.Section
+	 * 
+	 * Mirrors a single record in Experience table.
+	 * See SQLite.Section for more details.
+	 * 
+	 * @author Zachary Gateley
+	 *
+	 */
+	public static class Section extends SQLite.Section {
+		/**
+		 * Detail extends SQLite.Section.Detail
+		 * 
+		 * Mirrors a single record in ExperienceDetail table.
+		 * See SQLite.Section.Detail for more information.
+		 * 
+		 * @author Zachary Gateley
+		 *
+		 */
+		public static class Detail extends SQLite.Section.Detail {
+			/**
+			 * Detail
+			 * 
+			 * Constructor adds current line from ResultSet 
+			 * from SQL call to CV database using QUERY_FULL.
+			 * 
+			 * @param results ResultSet from statement execution
+			 * @throws SQLException
+			 */
 			public Detail(ResultSet results) throws SQLException {
-				this.ID = results.getInt("ID");
-				this.EDUCATION_ID = results.getInt("EDUCATION_ID");
-				this.END_DATE = results.getString("END_DATE");
-				this.IS_EXPECTED = results.getInt("IS_EXPECTED") == 1;
-				this.DEGREE_TYPE = results.getString("DEGREE_TYPE");
-				this.DEGREE_SUBJECT = results.getString("DEGREE_SUBJECT");
-				this.GPA = results.getString("GPA");
-				this.LATIN_HONORS = results.getString("LATIN_HONORS");
-				this.DETAILS = results.getString("DETAILS");
+				super();
+				this.addFields(
+						results, 
+						"ID", "EDUCATION_ID", "END_DATE", "IS_EXPECTED",
+						"DEGREE_TYPE", "DEGREE_SUBJECT", "GPA", "LATIN_HONORS",
+						"DETAILS"
+						);
 			}
 		}
 		
-		public final int ID;
-		public final String ORGANIZATION;
-		public final String LOCATION;
-		public ArrayList<Education.Section.Detail> details;
-		public Section(ResultSet results) throws SQLException {
-			this.ID = results.getInt("ID");
-			this.ORGANIZATION = results.getString("ORGANIZATION");
-			this.LOCATION = results.getString("LOCATION");
-			this.details = new ArrayList<Education.Section.Detail>();
+		/**
+		 * Section
+		 * 
+		 * super() creates private: 
+		 * 	HashMap<String, String> this.fields
+		 *  ArrayList<*.Detail> 	this.details
+		 * 
+		 * @param results SQL ResultSet from QUERY_FULL statement call. Current line will instantiate the Section. 
+		 * @throws NumberFormatException
+		 * @throws SQLException
+		 */
+		public Section(ResultSet results) throws NumberFormatException, SQLException {
+			super();
+			// Populates this.fields
+			this.addFields(
+					results,
+					"ID", "ORGANIZATION", "LOCATION"
+			);
 		}
 		
+		@Override
+		/**
+		 * addDetail
+		 * 
+		 * Must include results with pointer to current line
+		 * from SQL statement call of QUERY_FULL.
+		 * 
+		 * @param results SQL ResultSet from statement execution.
+		 */
 		public void addDetail(ResultSet results) throws SQLException {
 			Education.Section.Detail newDetail = new Education.Section.Detail(results);
 			this.details.add(newDetail);
 		}
 	}
 	
+	/**
+	 * writeFormOptions
+	 * 
+	 * Called from Form Servlet.
+	 * Writes checkboxes for available output options.
+	 * 
+	 * @param request HTTP request from Servlet
+	 * @param response HTTP response from Servlet
+	 * @param database SQLite object with open connection
+	 * @param out stream to which to write output
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
 		ResultSet results = statement.executeQuery(Education.QUERY);
@@ -98,63 +143,56 @@ public class Education {
 		
 		return;
 	}
-		
-	public static ArrayList<Education.Section> getEducationList(
+	
+	/**
+	 * getEducationList
+	 * 
+	 * Return a list of Education.Section that represents
+	 * all of the data of this type to be output on this resume.
+	 * Called from Education.jsp
+	 * 
+	 * @param request HTTP request from Servlet
+	 * @param response HTTP response from Servlet
+	 * @param QUERY_FULL appropriate SQL query. See TopLevel implementation for more details. 
+	 * @param includedId HTML form checkbox name to find which table IDs are included in output
+	 * @param includedDetailId HTML form checkbox name to find which table IDs are included in Detail output
+	 * @param SectionType Class from calling *.java, *.Section extends SQLite.Section 
+	 * 
+	 * @return ArrayList of Sections
+	 * 		Each section has an ArrayList of details.
+	 * 		Even though the SQL tables are join left with multiple records of top-level ID,
+	 * 		there is only one Section returned for each top-level ID.  
+	 * 
+	 * @throws SQLException
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 */
+	public static ArrayList<? extends SQLite.Section> getEducationList(
 			HttpServletRequest request, 
 			HttpServletResponse response
-			) throws SQLException, IOException {
-
-		// Connect to database
-		SQLite database = new SQLite();
-		database.connect();
-		
-		// Return array
-		ArrayList<Education.Section> educationList = null;
-		
-		try {		
-			// Find which education items should be output
-			ArrayList<Integer> includedEducationById = new ArrayList<>(
-					Arrays.stream(request.getParameterValues("EDUCATION_ID"))
-					.map(s -> Integer.parseInt(s))
-					.collect(Collectors.toList())
-					);
-	
-			// Return array
-			educationList = new ArrayList<Education.Section>();
-			
-			Statement statement = database.createStatement();
-			ResultSet results = statement.executeQuery(Education.QUERY_FULL);
-			
-			try {
-				int educationId = -1;
-				Education.Section educationItem = null;
-				while (results.next()) {
-					int id = results.getInt("ID");
-					if (!includedEducationById.contains(id)) {
-						continue;
-					}
-					if (educationId != id) {
-						// Ordered by ID
-						educationId = id;
-						educationItem = new Education.Section(results);
-						educationList.add(educationItem);
-					}
-					// Add this detail to the selected education item
-					educationItem.addDetail(results);
-				}
-			}
-			finally {
-				if (statement != null) {
-					statement.close();
-				}
-			}
-		}
-		finally {
-			if (database != null) {
-				database.close();
-			}
-		}
-		
-		return educationList;
+			) throws SQLException, 
+					IOException, 
+					InstantiationException, 
+					IllegalAccessException, 
+					IllegalArgumentException, 
+					InvocationTargetException, 
+					NoSuchMethodException, 
+					SecurityException, 
+					ClassNotFoundException {
+		new com.zygateley.resume.Education();
+		return SQLite.getList(
+				request, 
+				response, 
+				Education.QUERY_FULL, 
+				"EDUCATION_ID", 
+				"EDUCATION_DETAIL_ID",
+				Education.Section.class
+				);
 	}
 }

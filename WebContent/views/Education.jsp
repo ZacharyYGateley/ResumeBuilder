@@ -8,18 +8,18 @@
 <%
 	// Get education set from Education class
 // 		(.getEducationSet opens and closes database)
-ArrayList<Education.Section> educationList = Education.getEducationList(request,  response);
+ArrayList<? extends SQLite.Section> educationList = Education.getEducationList(request,  response);
 int educationCount = educationList.size();
 for (int educationIndex = 0; educationIndex < educationCount; educationIndex++) {
-	Education.Section record = educationList.get(educationIndex);
+	SQLite.Section record = educationList.get(educationIndex);
 %>
 
 		<tr>
 			<td align=left valign=top class="SubHeader NoWrap">
-				<%= record.ORGANIZATION %>
+				<%= record.getField("ORGANIZATION") %>
 			</td>
 			<td align=left valign=top class="SubHeader Right NoWrap">
-				<%= record.LOCATION %>
+				<%= record.getField("LOCATION") %>
 			</td>
 		</tr>
 		
@@ -32,30 +32,32 @@ for (int educationIndex = 0; educationIndex < educationCount; educationIndex++) 
 	<%
 	
 	// Make details more readily available
-	ArrayList<Education.Section.Detail> detailSet = record.details;
+	ArrayList<SQLite.Section.Detail> detailSet = record.getDetails();
 	int detailCount = detailSet.size();
 	
 	for (int detailIndex = 0; detailIndex < detailCount; detailIndex++) {
-		Education.Section.Detail detail = detailSet.get(detailIndex);
-		String endDate = SQLite.formateSQLiteDate(detail.END_DATE);
+		SQLite.Section.Detail detail = detailSet.get(detailIndex);
+		String endDate = SQLite.formatSQLiteDate(detail.getField("END_DATE"));
 		%>
 		
 		<tr>
 			<td align=left valign=top style="width:10px;" class="SubSubHeader NoWrap">
 				<%= 
-					detail.DEGREE_TYPE 
+					detail.getField("DEGREE_TYPE")
 				%><%= 
-					(!detail.DEGREE_TYPE.isBlank()) ? "," : "" 
-				%>
+					((!detail.getField("DEGREE_TYPE").isBlank()) ? "," : "")
+					%>
 			</td>
 			<td align=left valign=top style="width:10px;" class="SubSubHeader NoWrap">
-				&nbsp;&nbsp;<%= detail.DEGREE_SUBJECT %>&nbsp;&nbsp;
+				&nbsp;&nbsp;<%= detail.getField("DEGREE_SUBJECT") %>&nbsp;&nbsp;
 			</td>
 			
 		<%
 		
-		boolean haveGPA = detail.GPA != null && !detail.GPA.isBlank();
-		boolean haveHonors = detail.LATIN_HONORS != null && !detail.LATIN_HONORS.isBlank();
+		String GPA = detail.getField("GPA");
+		String LATIN_HONORS = detail.getField("LATIN_HONORS");
+		boolean haveGPA = GPA != null && !GPA.isBlank();
+		boolean haveHonors = LATIN_HONORS != null && !LATIN_HONORS.isBlank();
 		if (haveGPA || haveHonors) {
 			
 			%>
@@ -66,7 +68,7 @@ for (int educationIndex = 0; educationIndex < educationCount; educationIndex++) 
 			
 			<td align=left valign=top class="NoWrap">
 				<span <%= (haveGPA ? "style=\"font-style:normal;\"" : "class=\"latin\"") %> >
-					&nbsp;&nbsp;<%= (haveGPA ? "GPA: " + detail.GPA : detail.LATIN_HONORS) %>
+					&nbsp;&nbsp;<%= (haveGPA ? "GPA: " + GPA : LATIN_HONORS) %>
 				</span>
 			</td>
 			
@@ -86,21 +88,22 @@ for (int educationIndex = 0; educationIndex < educationCount; educationIndex++) 
 		%>
 		
 			<td align=left valign=top class="SubSubHeader Right">
-				<%= (detail.IS_EXPECTED) ? "Expected " : "" %>
+				<%= (Integer.parseInt(detail.getField("IS_EXPECTED")) > 0) ? "Expected " : "" %>
 				<%= endDate %>
 			</td>
 		</tr>
 		
 		<%
 		
-		boolean haveDetails = detail.DETAILS != null && !detail.DETAILS.isBlank();
+		String DETAILS = detail.getField("DETAILS");
+		boolean haveDetails = DETAILS != null && !DETAILS.isBlank();
 		if (haveDetails) {
 			
 		%>
 		
 		<tr>
 			<td align=left valign=middle colspan=5>
-				<%= detail.DETAILS %>
+				<%= DETAILS %>
 			</td>
 		</tr>
 		

@@ -1,16 +1,16 @@
 package com.zygateley.resume;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.*;
 
 
 
 
-public class Skills {
+public class Skills implements TopLevel {
 	private static final String QUERY_FULL = 
 			"SELECT s.ID, s.TITLE, \r\n" + 
 			"sd.ID as DETAIL_ID, sd.SKILLS_ID,\r\n" + 
@@ -20,36 +20,95 @@ public class Skills {
 			"ORDER BY s.ID, DETAIL_ID";
 	public static final int SECTION_COUNT = 3; 
 	
-	// Skill joined structure
-	// Mirrors single Skills record
-	// Contains mirrors of SkillsDetails records
-	public static class Section {
-		// SkillDetail structure
-		// Mirrors a single record in SkillDetail table
-		public static class Detail {
-			public final String TITLE;
-			public final String PROFICIENCY;
-			Detail(String title, String proficiency) {
-				this.TITLE = title;
-				this.PROFICIENCY = proficiency;
+	/** 
+	 * Section extends SQLite.Section
+	 * 
+	 * Mirrors a single record in Experience table.
+	 * See SQLite.Section for more details.
+	 * 
+	 * @author Zachary Gateley
+	 *
+	 */
+	public static class Section extends SQLite.Section {
+		/**
+		 * Detail extends SQLite.Section.Detail
+		 * 
+		 * Mirrors a single record in ExperienceDetail table.
+		 * See SQLite.Section.Detail for more information.
+		 * 
+		 * @author Zachary Gateley
+		 *
+		 */
+		public static class Detail extends SQLite.Section.Detail {
+			/**
+			 * Detail
+			 * 
+			 * Constructor adds current line from ResultSet 
+			 * from SQL call to CV database using QUERY_FULL.
+			 * 
+			 * @param results ResultSet from statement execution
+			 * @throws SQLException
+			 */
+			Detail(ResultSet results) throws SQLException {
+				super();
+				this.addFields(results, "DETAIL_TITLE");
+				
+				// Proficiency has extra processing
+				// Get string proficiency from 1-5 proficiency
+				int proficiency = results.getInt("PROFICIENCY");
+				String proficiencyString = Skills.proficiencyIntegerToString(proficiency);
+				this.fields.put("PROFICIENCY", proficiencyString);
 			}
 		}
-		
-		public final int ID;
-		public final String TITLE;
-		public ArrayList<Detail> details;
-		public Section(int id, String title) {
-			this.ID = id;
-			this.TITLE = title;
-			this.details = new ArrayList<Skills.Section.Detail>();
+
+		/**
+		 * Section
+		 * 
+		 * super() creates private: 
+		 * 	HashMap<String, String> this.fields
+		 *  ArrayList<*.Detail> 	this.details
+		 * 
+		 * @param results SQL ResultSet from QUERY_FULL statement call. Current line will instantiate the Section. 
+		 * @throws NumberFormatException
+		 * @throws SQLException
+		 */
+		public Section(ResultSet results) throws NumberFormatException, SQLException {
+			super();
+			// Populates this.fields
+			this.addFields(
+					results,
+					"ID", "TITLE"
+			);
 		}
 		
-		public void addDetail(String title, String proficiency) {
-			Detail newDetail = new Skills.Section.Detail(title, proficiency);
+		@Override
+		/**
+		 * addDetail
+		 * 
+		 * Must include results with pointer to current line
+		 * from SQL statement call of QUERY_FULL.
+		 * 
+		 * @param results SQL ResultSet from statement execution.
+		 */
+		public void addDetail(ResultSet results) throws SQLException {
+			Skills.Section.Detail newDetail = new Skills.Section.Detail(results);
 			this.details.add(newDetail);
 		}
 	}
 	
+	/**
+	 * writeFormOptions
+	 * 
+	 * Called from Form Servlet.
+	 * Writes checkboxes for available output options.
+	 * 
+	 * @param request HTTP request from Servlet
+	 * @param response HTTP response from Servlet
+	 * @param database SQLite object with open connection
+	 * @param out stream to which to write output
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public static void writeFormOptions(HttpServletRequest request, HttpServletResponse response, SQLite database, PrintWriter out) throws IOException, SQLException {
 		Statement statement = database.createStatement();
 		ResultSet results = statement.executeQuery(Skills.QUERY_FULL);
@@ -110,77 +169,70 @@ public class Skills {
 		return;
 	}
 	
-	public static ArrayList<Skills.Section> getSkillList(
+	/**
+	 * getSkillList
+	 * 
+	 * Return a list of Education.Section that represents
+	 * all of the data of this type to be output on this resume.
+	 * Called from Skills.jsp
+	 * 
+	 * @param request HTTP request from Servlet
+	 * @param response HTTP response from Servlet
+	 * @param QUERY_FULL appropriate SQL query. See TopLevel implementation for more details. 
+	 * @param includedId HTML form checkbox name to find which table IDs are included in output
+	 * @param includedDetailId HTML form checkbox name to find which table IDs are included in Detail output
+	 * @param SectionType Class from calling *.java, *.Section extends SQLite.Section 
+	 * 
+	 * @return ArrayList of Sections
+	 * 		Each section has an ArrayList of details.
+	 * 		Even though the SQL tables are join left with multiple records of top-level ID,
+	 * 		there is only one Section returned for each top-level ID.  
+	 * 
+	 * @throws SQLException
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 * @throws ClassNotFoundException
+	 */
+	public static ArrayList<? extends SQLite.Section> getSkillList(
 			HttpServletRequest request, 
 			HttpServletResponse response
-			) throws SQLException, IOException {
-
-		// Connect to database
-		SQLite database = new SQLite();
-		database.connect();
-		
-		// Return array
-		ArrayList<Skills.Section> skillList = null;
-		
-		try {		
-			// Find which skills should be output
-			ArrayList<Integer> includedSkillsById = new ArrayList<>(
-					Arrays.stream(request.getParameterValues("SKILL_ID"))
-					.map(s -> Integer.parseInt(s))
-					.collect(Collectors.toList())
-					);
-			ArrayList<Integer> includedSkillDetailsById = new ArrayList<>(
-					Arrays.stream(request.getParameterValues("SKILL_DETAIL_ID"))
-					.map(s -> Integer.parseInt(s))
-					.collect(Collectors.toList())
-					);
-	
-			// Return array
-			skillList = new ArrayList<Skills.Section>();
-			
-			Statement statement = database.createStatement();
-			ResultSet results = statement.executeQuery(Skills.QUERY_FULL);
-			
-			try {
-				int skillId = -1;
-				Skills.Section skill = null;
-				while (results.next()) {
-					int id = results.getInt("ID");
-					int detail_id = results.getInt("DETAIL_ID");
-					if (!includedSkillsById.contains(id) || !includedSkillDetailsById.contains(detail_id)) {
-						continue;
-					}
-					if (skillId != id) {
-						// Ordered by ID
-						skillId = id;
-						skill = new Skills.Section(
-								id,
-								results.getString("TITLE")
-								);
-						skillList.add(skill);
-					}
-					// Add this detail to the selected skill
-					String title = results.getString("DETAIL_TITLE");
-					int proficiency = results.getInt("PROFICIENCY");
-					String proficiencyString = Skills.proficiencyIntegerToString(proficiency); 
-					skill.addDetail(title, proficiencyString);
-				}
-			}
-			finally {
-				if (statement != null) {
-					statement.close();
-				}
-			}
-		}
-		finally {
-			if (database != null) {
-				database.close();
-			}
-		}
-		
-		return skillList;
+			) throws SQLException, 
+					IOException, 
+					InstantiationException, 
+					IllegalAccessException, 
+					IllegalArgumentException, 
+					InvocationTargetException, 
+					NoSuchMethodException, 
+					SecurityException, 
+					ClassNotFoundException {
+		return SQLite.getList(
+				request, 
+				response, 
+				Skills.QUERY_FULL, 
+				"SKILL_ID", 
+				"SKILL_DETAIL_ID",
+				Skills.Section.class
+				);
 	}
 	
+	/**
+	 * proficiencyIntegerToString
+	 * 
+	 * Proficiency is stored in the database as an integer.
+	 * (At the time of writing: with intended range 1-5).
+	 * This method converts proficiency integers to 
+	 * resume output strings. 
+	 * 
+	 * e.g. Proficient, Familiar, Somewhat Familiar
+	 * 
+	 * @param proficiencyInt proficiency integer from database
+	 * @return formatted proficiency string
+	 */
 	private static String proficiencyIntegerToString(int proficiencyInt) {
 		if (proficiencyInt == 5) {
 			return "Proficient";

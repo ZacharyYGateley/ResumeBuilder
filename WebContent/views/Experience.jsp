@@ -5,13 +5,14 @@
 <%
 	// Get experience set from Experience class
 // 		(.getExperienceSet opens and closes database)
-ArrayList<Experience.Section> experienceList = Experience.getExperienceList(request,  response);
+ArrayList<? extends SQLite.Section> experienceList = Experience.getExperienceList(request,  response);
 int headerId = -1;
 int experienceCount = experienceList.size();
 for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex++) {
-	Experience.Section record = experienceList.get(experienceIndex);
+	SQLite.Section record = experienceList.get(experienceIndex);
+	int HEADER_ID = Integer.parseInt(record.getField("HEADER_ID"));
 	
-	if (headerId != record.HEADER_ID) {
+	if (headerId != HEADER_ID) {
 		if (headerId > -1) {
 			%>	
 
@@ -22,36 +23,38 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 		}
 		%>
 		
-<div class="Header"><%= record.HEADER %></div>
+<div class="Header"><%= record.getField("HEADER") %></div>
 
 <table border=0 cellspacing=0 cellpadding=0>
 	<tbody>
 		
 		<%
-		headerId = record.HEADER_ID;
+		headerId = HEADER_ID;
 	}
 	
 	String dateString = "";
-	if (record.START_DATE != null && !record.START_DATE.isBlank()) {
-		dateString += SQLite.formateSQLiteDate(record.START_DATE) + "&nbsp;&ndash;&nbsp;";
+	String START_DATE = record.getField("START_DATE");
+	if (START_DATE != null && !START_DATE.isBlank()) {
+		dateString += SQLite.formatSQLiteDate(START_DATE) + "&nbsp;&ndash;&nbsp;";
 	}
-	if (record.END_DATE != null && !record.END_DATE.isBlank()) {
-		dateString += SQLite.formateSQLiteDate(record.END_DATE);
+	String END_DATE = record.getField("END_DATE");
+	if (END_DATE != null && !END_DATE.isBlank()) {
+		dateString += SQLite.formatSQLiteDate(END_DATE);
 	}
 %>
 
 		<tr>
 			<td align=left valign=top class="SubHeader NoWrap">
-				<%= record.ORGANIZATION %>
+				<%= record.getField("ORGANIZATION") %>
 			</td>
 			<td align=left valign=top class="SubHeader Right NoWrap">
-				<%= record.LOCATION %>
+				<%= record.getField("LOCATION") %>
 			</td>
 		</tr>
 		
 		<tr>
 			<td align=left valign=top class="SubSubHeader JobTitle NoWrap">
-				<%= record.TITLE %>
+				<%= record.getField("TITLE") %>
 			</td>
 			<td align=left valign=top class="SubSubHeader NoWrap Right">
 				<%= dateString %>
@@ -65,14 +68,14 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 	<%
 	
 	// Make details more readily available
-	ArrayList<Experience.Section.Detail> detailSet = record.details;
+	ArrayList<SQLite.Section.Detail> detailSet = record.getDetails();
 	int detailCount = detailSet.size();
 	
 	for (int detailIndex = 0; detailIndex < detailCount; detailIndex++) {
 		%>
 		
 					<li>
-						<%= detailSet.get(detailIndex).TEXT %>
+						<%= detailSet.get(detailIndex).getField("TEXT") %>
 					</li>
 				
 		<%

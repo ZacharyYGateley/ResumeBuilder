@@ -8,20 +8,20 @@
 <%
 	// Get skillset from Skills class
 // 		(.getSkillSet opens and closes database)
-ArrayList<Skills.Section> skillList = Skills.getSkillList(request,  response);
+ArrayList<? extends SQLite.Section> skillList = Skills.getSkillList(request,  response);
 int skillCount = skillList.size();
 for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
-	Skills.Section record = skillList.get(skillIndex);
+	SQLite.Section record = skillList.get(skillIndex);
 %>
 
 		<tr>
 			<td align=left valign=top class="SubSubHeader OtherSkillsTop NoWrap Column1">
-				<%=record.TITLE%>
+				<%= record.getField("TITLE") %>
 			</td>
 
 	<%
 	// Make details more readily available
-	ArrayList<Skills.Section.Detail> detailSet = record.details;
+	ArrayList<SQLite.Section.Detail> detailSet = record.getDetails();
 	int detailCount = detailSet.size();
 	int detailIndex = 0;
 	
@@ -42,13 +42,13 @@ for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 		<%
 		// Output specific skills (details)
 		for (int i = 0; i < perColumn; i++, detailIndex++) {
-			Skills.Section.Detail detail = detailSet.get(detailIndex);
+			SQLite.Section.Detail detail = detailSet.get(detailIndex);
 		%>
 				
 					<li>
-						<%= detail.TITLE %>
+						<%= detail.getField("DETAIL_TITLE") %>
 						<span class="Proficiency">
-							(<%= detail.PROFICIENCY %>)
+							(<%= detail.getField("PROFICIENCY") %>)
 						</span>
 					</li>
 					
