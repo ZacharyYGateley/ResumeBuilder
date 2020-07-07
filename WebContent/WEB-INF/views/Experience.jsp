@@ -41,6 +41,9 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 	if (END_DATE != null && !END_DATE.isBlank()) {
 		dateString += SQLite.formatSQLiteDate(END_DATE);
 	}
+	else if (!dateString.isBlank()) {
+		dateString += "Present";
+	}
 %>
 
 		<tr>

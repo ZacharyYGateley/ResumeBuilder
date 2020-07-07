@@ -17,8 +17,9 @@ public class Skills implements TopLevel {
 			"sd.TITLE AS DETAIL_TITLE, sd.PROFICIENCY\r\n" + 
 			"FROM SkillsDetail AS sd LEFT JOIN Skills AS s\r\n" + 
 			"ON s.ID=sd.SKILLS_ID\r\n" + 
-			"ORDER BY s.ID, DETAIL_ID";
-	public static final int SECTION_COUNT = 3; 
+			"ORDER BY s.ID, sd.SORT_ORDER";
+	public static final int COLUMN_COUNT = 3; 
+	public static final int COLUMN_COUNT_SINGLE = 4;
 	
 	/** 
 	 * Section extends SQLite.Section

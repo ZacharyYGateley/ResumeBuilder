@@ -10,34 +10,45 @@
 // 		(.getSkillSet opens and closes database)
 ArrayList<? extends SQLite.Section> skillList = Skills.getSkillList(request,  response);
 int skillCount = skillList.size();
+boolean haveMultipleHeaders = !skillList.get(0).getField("TITLE")
+	.equals(
+			skillList.get(skillList.size() - 1).getField("TITLE"));
 for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 	SQLite.Section record = skillList.get(skillIndex);
 %>
 
 		<tr>
+		
+<%
+	if (haveMultipleHeaders) {
+%>
+
 			<td align=left valign=top class="SubSubHeader OtherSkillsTop NoWrap Column1">
 				<%= record.getField("TITLE") %>
 			</td>
 
 	<%
-	// Make details more readily available
-	ArrayList<SQLite.Section.Detail> detailSet = record.getDetails();
-	int detailCount = detailSet.size();
-	int detailIndex = 0;
-	
-	// Skills are cut into columns (SECTION_COUNT)
-	int perColumn = (int) (Math.ceil(detailCount / (double) Skills.SECTION_COUNT));
-	OUTER_LOOP: for (int column = 0; column < Skills.SECTION_COUNT; column++) {
+		}
 		
-		// Last column should span the rest of the columns
-		boolean isMultispan = (detailIndex + perColumn >= detailCount);
+		// Make details more readily available
+		ArrayList<SQLite.Section.Detail> detailSet = record.getDetails();
+		int detailCount = detailSet.size();
+		int detailIndex = 0;
+		
+		// Skills are cut into columns (SECTION_COUNT)
+		int columnCount = (haveMultipleHeaders ? Skills.COLUMN_COUNT : Skills.COLUMN_COUNT_SINGLE);
+		int perColumn = (int) (Math.ceil(detailCount / (double) columnCount));
+		OUTER_LOOP: for (int column = 0; column < columnCount; column++) {
+			
+			// Last column should span the rest of the columns
+			boolean isMultispan = (detailIndex + perColumn >= detailCount);
 	%>
 			
 			<td align=left valign=top class="OtherSkillsTop NoWrap 
 			<%=(isMultispan) ? 
-					("\" colspan=\"" + (Skills.SECTION_COUNT - column)) : 
+					("\" colspan=\"" + (columnCount - column)) : 
 					(" Column" + (column + 2))%>">
-				<ul class="List<%=(detailIndex % 2)%>">
+				<ul class="List<%=(skillIndex % 2)%>">
 
 		<%
 		// Output specific skills (details)
