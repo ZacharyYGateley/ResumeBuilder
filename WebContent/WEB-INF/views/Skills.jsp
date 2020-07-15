@@ -57,10 +57,21 @@ for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 		%>
 				
 					<li>
-						<%= detail.getField("DETAIL_TITLE") %>
-						<span class="Proficiency">
-							(<%= detail.getField("PROFICIENCY") %>)
-						</span>
+
+<table border=0>
+  <tbody>
+    <tr>
+      <td cellspacing=0 cellpadding=0 style="text-align:left;">
+		<%= detail.getField("DETAIL_TITLE") %>
+      </td>
+      <td cellspacing=0 cellpadding=0 style="text-align:right;">
+		<span class="Proficiency">
+		  (<%= detail.getField("PROFICIENCY") %>)
+		</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
 					</li>
 					
 			<%
@@ -81,7 +92,9 @@ for (int skillIndex = 0; skillIndex < skillCount; skillIndex++) {
 		</tr>
 		<!-- Spacer at the end of each block of any kind -->
 		<tr>
-			<td class="TableSpacer">&nbsp;</td>
+			<td>
+				<div class="TableSpacer"></div>
+			</td>
 		</tr>
 		
 	<%

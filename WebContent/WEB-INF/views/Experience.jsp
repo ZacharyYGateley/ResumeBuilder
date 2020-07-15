@@ -92,8 +92,8 @@ for (int experienceIndex = 0; experienceIndex < experienceCount; experienceIndex
 		
 		<!-- Spacer row between any two blocks -->
 		<tr>
-			<td class="TableSpacer">
-				&nbsp;
+			<td>
+				<div class="TableSpacer"></div>
 			</td>
 		</tr>
 		

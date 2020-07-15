@@ -124,8 +124,8 @@ for (int educationIndex = 0; educationIndex < educationCount; educationIndex++) 
 		
 		<!-- Spacer row between any two blocks -->
 		<tr>
-			<td class="TableSpacer">
-				&nbsp;
+			<td>
+				<div class ="TableSpacer"></div>
 			</td>
 		</tr>	
 	
